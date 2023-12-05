@@ -65,8 +65,11 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+
+            //Commented to prevent the package name from changing in relation to google-service.json in debug mode
+
+            //applicationIdSuffix ".debug"
+            //versionNameSuffix "-debug"
         }
         release {
             signingConfig signingConfigs.release
