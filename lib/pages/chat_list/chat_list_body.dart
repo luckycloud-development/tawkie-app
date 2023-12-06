@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:tawkie/pages/chat_list/add_chat_network.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +15,7 @@ import 'package:tawkie/pages/chat_list/search_title.dart';
 import 'package:tawkie/pages/chat_list/space_view.dart';
 import 'package:tawkie/pages/chat_list/stories_header.dart';
 import 'package:tawkie/pages/user_bottom_sheet/user_bottom_sheet.dart';
+import 'package:tawkie/services/notification_service.dart';
 import 'package:tawkie/utils/adaptive_bottom_sheet.dart';
 import 'package:tawkie/utils/matrix_sdk_extensions/client_stories_extension.dart';
 import 'package:tawkie/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -40,6 +43,9 @@ class ChatListViewBody extends StatelessWidget {
         Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(100);
     final subtitleColor =
         Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(50);
+
+    // Token initialization for Android and iOS push notifications
+    if(Platform.isAndroid || Platform.isIOS) NotificationService.initialize();
 
     return PageTransitionSwitcher(
       transitionBuilder: (
