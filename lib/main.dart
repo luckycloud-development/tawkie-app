@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -16,13 +15,6 @@ import 'config/setting_keys.dart';
 import 'utils/background_push.dart';
 import 'widgets/fluffy_chat_app.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-// If you're going to use other Firebase services in the background, such as Firestore,
-// make sure you call `initializeApp` before using other Firebase services.
-// await Firebase.initializeApp();
-  print('Background message ${message.messageId}');
-}
-
 void main() async {
   Logs().i('Welcome to ${AppConfig.applicationName} <3');
 
@@ -30,11 +22,6 @@ void main() async {
   // To make sure that the parts of flutter needed are started up already, we need to ensure that the
   // widget bindings are initialized already.
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Listen to real-time notifications for Android and iOS only
-  if(Platform.isAndroid || Platform.isIOS){
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  }
 
   Logs().nativeColors = !PlatformInfos.isIOS;
   final store = await SharedPreferences.getInstance();

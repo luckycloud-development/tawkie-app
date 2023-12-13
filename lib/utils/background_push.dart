@@ -39,7 +39,7 @@ import '../config/setting_keys.dart';
 import '../widgets/matrix.dart';
 import 'platform_infos.dart';
 
-//import 'package:fcm_shared_isolate/fcm_shared_isolate.dart';
+import 'package:fcm_shared_isolate/fcm_shared_isolate.dart';
 
 class NoTokenException implements Exception {
   String get cause => 'Cannot get firebase token';
@@ -64,7 +64,7 @@ class BackgroundPush {
 
   final pendingTests = <String, Completer<void>>{};
 
-  final dynamic firebase = null; //FcmSharedIsolate();
+  final dynamic firebase = FcmSharedIsolate(); //FcmSharedIsolate();
 
   DateTime? lastReceivedPush;
 
@@ -74,16 +74,18 @@ class BackgroundPush {
     onRoomSync ??= client.onSync.stream
         .where((s) => s.hasRoomUpdate)
         .listen((s) => _onClearingPush(getFromServer: false));
-    firebase?.setListeners(
-      onMessage: (message) => pushHelper(
-        PushNotification.fromJson(
-          Map<String, dynamic>.from(message['data'] ?? message),
-        ),
-        client: client,
-        l10n: l10n,
-        activeRoomId: matrix?.activeRoomId,
-        onSelectNotification: goToRoom,
-      ),
+    firebase.setListeners(
+      onMessage: (message) {
+        pushHelper(
+          PushNotification.fromJson(
+            Map<String, dynamic>.from(message['data'] ?? message),
+          ),
+          client: client,
+          l10n: l10n,
+          activeRoomId: matrix?.activeRoomId,
+          onSelectNotification: goToRoom,
+        );
+      },
     );
     if (Platform.isAndroid) {
       UnifiedPush.initialize(
@@ -157,9 +159,9 @@ class BackgroundPush {
     if (deviceAppId.length > 64) {
       deviceAppId = deviceAppId.substring(0, 64);
     }
-    if (!useDeviceSpecificAppId && PlatformInfos.isAndroid) {
-      appId += '.data_message';
-    }
+    // if (!useDeviceSpecificAppId && PlatformInfos.isAndroid) {
+    //   appId += '.data_message';
+    // }
     final thisAppId = useDeviceSpecificAppId ? deviceAppId : appId;
     if (gatewayUrl != null && token != null) {
       final currentPushers = pushers.where((pusher) => pusher.pushkey == token);
@@ -292,6 +294,7 @@ class BackgroundPush {
     if (_fcmToken?.isEmpty ?? true) {
       try {
         _fcmToken = await firebase?.getToken();
+        print("FCM token: $_fcmToken");
         if (_fcmToken == null) throw ('PushToken is null');
       } catch (e, s) {
         Logs().w('[Push] cannot get token', e, e is String ? null : s);

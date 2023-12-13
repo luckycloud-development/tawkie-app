@@ -86,7 +86,7 @@ class CallKeepManager {
   late FlutterCallkeep _callKeep;
   VoipPlugin? _voipPlugin;
 
-  String get appName => 'FluffyChat';
+  String get appName => 'Tawkie';
 
   Future<bool> get hasPhoneAccountEnabled async =>
       await _callKeep.hasPhoneAccount();
@@ -99,7 +99,7 @@ class CallKeepManager {
         'okButton': 'ok',
         // Required to get audio in background when using Android 11
         'foregroundService': {
-          'channelId': 'com.fluffy.fluffychat',
+          'channelId': 'fr.tawkie.app',
           'channelName': 'Foreground service for my app',
           'notificationTitle': '$appName is running on background',
           'notificationIcon': 'mipmap/ic_notification_launcher',
