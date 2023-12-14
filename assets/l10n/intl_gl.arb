@@ -2676,5 +2676,19 @@
   "groupName": "Nome do grupo",
   "@groupName": {},
   "searchChatsRooms": "Buscar #conversas, @usuarias...",
-  "@searchChatsRooms": {}
+  "@searchChatsRooms": {},
+  "startConversation": "Iniciar conversa",
+  "@startConversation": {},
+  "commandHint_sendraw": "Enviar json sen editar",
+  "@commandHint_sendraw": {},
+  "wrongRecoveryKey": "Desculpa... non semella ser o xeito correcto de recuperar a chave.",
+  "@wrongRecoveryKey": {},
+  "blockListDescription": "Podes bloquear usuarias que che molesten. Non recibirás mensaxes nin convites para salas procedentes das usuarias da túa lista persoal de bloqueo.",
+  "@blockListDescription": {},
+  "blockedUsers": "Usuarias bloqueadas",
+  "@blockedUsers": {},
+  "block": "bloquear",
+  "@block": {},
+  "blockUsername": "Ignorar identificador",
+  "@blockUsername": {}
 }
