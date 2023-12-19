@@ -64,7 +64,7 @@ class BackgroundPush {
 
   final pendingTests = <String, Completer<void>>{};
 
-  final dynamic firebase = FcmSharedIsolate(); //FcmSharedIsolate();
+  final dynamic firebase = FcmSharedIsolate();
 
   DateTime? lastReceivedPush;
 
