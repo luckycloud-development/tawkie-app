@@ -54,13 +54,13 @@ abstract class AppConfig {
   static const String inviteLinkPrefix = 'https://matrix.to/#/';
   static const String deepLinkPrefix = 'im.fluffychat://chat/';
   static const String schemePrefix = 'matrix:';
-  static const String pushNotificationsChannelId = 'fluffychat_push';
-  static const String pushNotificationsChannelName = 'FluffyChat push channel';
+  static const String pushNotificationsChannelId = 'tawkie_push';
+  static const String pushNotificationsChannelName = 'Tawkie push channel';
   static const String pushNotificationsChannelDescription =
-      'Push notifications for FluffyChat';
-  static const String pushNotificationsAppId = 'fr.tawkie.fr';
+      'Push notifications for Tawkie';
+  static const String pushNotificationsAppId = 'fr.tawkie.app';
   static const String pushNotificationsGatewayUrl =
-      'https://push.fluffychat.im/_matrix/push/v1/notify';
+      'https://push.tawkie.fr/_matrix/push/v1/notify';
   static const String pushNotificationsPusherFormat = 'event_id_only';
   static const String emojiFontName = 'Noto Emoji';
   static const String emojiFontUrl =
