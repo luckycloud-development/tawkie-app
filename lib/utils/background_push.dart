@@ -75,15 +75,20 @@ class BackgroundPush {
         .where((s) => s.hasRoomUpdate)
         .listen((s) => _onClearingPush(getFromServer: false));
     firebase?.setListeners(
-      onMessage: (message) => pushHelper(
-        PushNotification.fromJson(
-          Map<String, dynamic>.from(message['data'] ?? message),
-        ),
-        client: client,
-        l10n: l10n,
-        activeRoomId: matrix?.activeRoomId,
-        onSelectNotification: goToRoom,
-      ),
+      onMessage: (message) {
+        message['devices'] = [
+          {'app_id': 'fr.tawkie.app', 'pushkey': 'bogus'}
+        ];
+        pushHelper(
+          PushNotification.fromJson(
+            Map<String, dynamic>.from(message['data'] ?? message),
+          ),
+          client: client,
+          l10n: l10n,
+          activeRoomId: matrix?.activeRoomId,
+          onSelectNotification: goToRoom,
+        );
+      },
     );
     if (Platform.isAndroid) {
       UnifiedPush.initialize(

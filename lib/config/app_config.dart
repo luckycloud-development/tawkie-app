@@ -27,7 +27,7 @@ abstract class AppConfig {
       'https://github.com/krille-chan/fluffychat/wiki/How-to-use-end-to-end-encryption-in-FluffyChat';
   static const String startChatTutorial =
       'https://github.com/krille-chan/fluffychat/wiki/How-to-Find-Users-in-FluffyChat';
-  static const String appId = 'fr.tawkie.fr';
+  static const String appId = 'fr.tawkie.app';
   static const String appOpenUrlScheme = 'im.fluffychat';
   static String _webBaseUrl = 'https://fluffychat.im/web';
   static String get webBaseUrl => _webBaseUrl;
@@ -58,7 +58,7 @@ abstract class AppConfig {
   static const String pushNotificationsChannelName = 'FluffyChat push channel';
   static const String pushNotificationsChannelDescription =
       'Push notifications for FluffyChat';
-  static const String pushNotificationsAppId = 'fr.tawkie.com';
+  static const String pushNotificationsAppId = 'fr.tawkie.app';
   static const String pushNotificationsGatewayUrl =
       'https://push.tawkie.fr/_matrix/push/v1/notify';
   static const String pushNotificationsPusherFormat = 'event_id_only';
