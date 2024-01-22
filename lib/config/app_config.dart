@@ -58,9 +58,9 @@ abstract class AppConfig {
   static const String pushNotificationsChannelName = 'FluffyChat push channel';
   static const String pushNotificationsChannelDescription =
       'Push notifications for FluffyChat';
-  static const String pushNotificationsAppId = 'fr.tawkie.fr';
+  static const String pushNotificationsAppId = 'fr.tawkie.com';
   static const String pushNotificationsGatewayUrl =
-      'https://push.fluffychat.im/_matrix/push/v1/notify';
+      'https://push.tawkie.fr/_matrix/push/v1/notify';
   static const String pushNotificationsPusherFormat = 'event_id_only';
   static const String emojiFontName = 'Noto Emoji';
   static const String emojiFontUrl =
