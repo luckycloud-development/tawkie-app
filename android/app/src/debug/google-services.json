@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "153521612486",
+    "project_id": "tawkie-android",
+    "storage_bucket": "tawkie-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153521612486:android:78e83903b3c4d50f11d9c7",
+        "android_client_info": {
+          "package_name": "fr.tawkie.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSjao7C7QsbI2bYb8q7nVO7e-61SZ5ln8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153521612486:android:e942c943d0d1272711d9c7",
+        "android_client_info": {
+          "package_name": "fr.tawkie.app.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSjao7C7QsbI2bYb8q7nVO7e-61SZ5ln8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
