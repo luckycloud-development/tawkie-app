@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:tawkie/config/app_config.dart';
-
 import 'package:tawkie/config/themes.dart';
+import 'package:tawkie/pages/chat/events/merge_message_content.dart';
 import 'package:tawkie/pages/chat/events/message_reactions.dart';
 import 'package:tawkie/utils/date_time_extension.dart';
 import 'package:tawkie/utils/platform_infos.dart';
@@ -13,6 +12,7 @@ import 'package:tawkie/utils/string_color.dart';
 import 'package:tawkie/widgets/avatar.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:vibration/vibration.dart';
+
 import 'message_content.dart';
 import 'reply_content.dart';
 import 'state_message.dart';
@@ -22,6 +22,7 @@ class Message extends StatelessWidget {
   final Event event;
   final Event? nextEvent;
   final Event? nextNextEvent;
+  final Event? previousEvent;
   final bool displayReadMarker;
   final void Function(Event) onTab;
   final void Function(Event) onSelect;
@@ -41,7 +42,8 @@ class Message extends StatelessWidget {
   const Message(
     this.event, {
     this.nextEvent,
-        this.nextNextEvent,
+    this.nextNextEvent,
+    this.previousEvent,
     this.displayReadMarker = false,
     this.longPressSelect = false,
     required this.onTab,
@@ -78,6 +80,47 @@ class Message extends StatelessWidget {
         event.messageType == EventTypes.KeyVerificationRequest) {
       return VerificationRequestContent(event: event, timeline: timeline);
     }
+
+    bool haveSameOriginServerTs(
+        Event? event, Event? nextEvent, Event? nextNextEvent) {
+      if (event == null || nextEvent == null || nextNextEvent == null) {
+        return false;
+      }
+      return event.originServerTs == nextEvent.originServerTs &&
+          nextEvent.originServerTs == nextNextEvent.originServerTs;
+    }
+
+    List<Event> createEventGroup() {
+      return [event, nextEvent, nextNextEvent]
+          .where((e) => e != null)
+          .cast<Event>()
+          .toList();
+    }
+
+    bool shouldGroupEvents() {
+      return haveSameOriginServerTs(event, nextEvent, nextNextEvent);
+    }
+
+    bool haveSamePreviousOriginServerTs(Event? event, Event? previousEvent) {
+      if (event == null || previousEvent == null) {
+        return false;
+      }
+      return event.originServerTs == previousEvent.originServerTs;
+    }
+
+    bool shouldHideEvent() {
+      return haveSamePreviousOriginServerTs(event, previousEvent);
+    }
+
+    final bool hideEvent = shouldHideEvent();
+
+    if (hideEvent) {
+      return SizedBox
+          .shrink(); // Ou retournez un autre widget pour masquer l'événement
+    }
+
+    final List<Event> groupedEvents =
+        shouldGroupEvents() ? createEventGroup() : [];
 
     final client = Matrix.of(context).client;
     final ownMessage = event.senderId == client.userID;
@@ -262,10 +305,12 @@ class Message extends StatelessWidget {
                               ),
                               padding: noBubble || noPadding
                                   ? EdgeInsets.zero
-                                  : const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
+                                  : groupedEvents.isEmpty
+                                      ? const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        )
+                                      : null,
                               constraints: const BoxConstraints(
                                 maxWidth: FluffyThemes.columnWidth * 1.5,
                               ),
@@ -315,12 +360,14 @@ class Message extends StatelessWidget {
                                         );
                                       },
                                     ),
-                                  MessageContent(
-                                    displayEvent,
-                                    textColor: textColor,
-                                    onInfoTab: onInfoTab,
-                                    borderRadius: borderRadius,
-                                  ),
+                                  groupedEvents.isNotEmpty
+                                      ? MergeMessageContent(groupedEvents)
+                                      : MessageContent(
+                                          displayEvent,
+                                          textColor: textColor,
+                                          onInfoTab: onInfoTab,
+                                          borderRadius: borderRadius,
+                                        ),
                                   if (event.hasAggregatedEvents(
                                     timeline,
                                     RelationshipTypes.edit,
