@@ -21,6 +21,7 @@ import 'verification_request_content.dart';
 class Message extends StatelessWidget {
   final Event event;
   final Event? nextEvent;
+  final Event? nextNextEvent;
   final bool displayReadMarker;
   final void Function(Event) onTab;
   final void Function(Event) onSelect;
@@ -40,6 +41,7 @@ class Message extends StatelessWidget {
   const Message(
     this.event, {
     this.nextEvent,
+        this.nextNextEvent,
     this.displayReadMarker = false,
     this.longPressSelect = false,
     required this.onTab,
