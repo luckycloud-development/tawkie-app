@@ -17,6 +17,9 @@ class MergeMessageContent extends StatelessWidget {
     final Uri url =
         Uri.parse(firstEvent.text); // Uri.parse to convert the string to Uri
 
+    // Check if the message contains a URL using a regular expression
+    final bool containsUrl = hasUrl(firstEvent.text);
+
     return Column(
       children: [
         // Display the remaining events in the group
@@ -30,21 +33,31 @@ class MergeMessageContent extends StatelessWidget {
         // Display the first event as a button with the extracted link
         SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              // Handle button click
-              openUrl(url);
-            },
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(8.0),
-                  bottomRight: Radius.circular(8.0),
+          child: containsUrl
+              ? ElevatedButton(
+                  onPressed: () {
+                    // Handle button click
+                    openUrl(url);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(8.0),
+                        bottomRight: Radius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  child: Text('Go to post'),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    firstEvent.text,
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            child: Text('Go to post'),
-          ),
         ),
       ],
     );
@@ -57,5 +70,15 @@ class MergeMessageContent extends StatelessWidget {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  // Function to check if a string contains a URL using a regular expression
+  bool hasUrl(String text) {
+    // Regular expression for matching URLs
+    final RegExp urlRegex = RegExp(
+      r'https?://(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]+)*(?:/[^\s]*)?',
+    );
+
+    return urlRegex.hasMatch(text);
   }
 }
