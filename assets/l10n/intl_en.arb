@@ -2516,5 +2516,6 @@
   "wellDone": "Well done",
   "codeCopy": "code copied to clipboard",
   "phoneField_explain": "Your numbers must be entered in international format!",
-  "phoneField_initialZero": "Depending on your country, the initial zero of the local number may not be included."
+  "phoneField_initialZero": "Depending on your country, the initial zero of the local number may not be included.",
+  "link_openPost": "Open post "
 }
