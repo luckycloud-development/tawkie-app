@@ -52,12 +52,12 @@ abstract class AppConfig {
   static const bool hideTypingUsernames = false;
   static const bool hideAllStateEvents = false;
   static const String inviteLinkPrefix = 'https://matrix.to/#/';
-  static const String deepLinkPrefix = 'im.fluffychat://chat/';
+  static const String deepLinkPrefix = 'fr.tawkie://chat/';
   static const String schemePrefix = 'matrix:';
-  static const String pushNotificationsChannelId = 'fluffychat_push';
-  static const String pushNotificationsChannelName = 'FluffyChat push channel';
+  static const String pushNotificationsChannelId = 'tawkie_push';
+  static const String pushNotificationsChannelName = 'Tawkie push channel';
   static const String pushNotificationsChannelDescription =
-      'Push notifications for FluffyChat';
+      'Push notifications for Tawkie';
   static const String pushNotificationsAppId = 'fr.tawkie.app';
   static const String pushNotificationsGatewayUrl =
       'https://push.tawkie.fr/_matrix/push/v1/notify';

@@ -121,7 +121,7 @@
 
                 <data
                     android:host="login"
-                    android:scheme="im.tawkie" />
+                    android:scheme="fr.tawkie" />
             </intent-filter>
         </activity>
 

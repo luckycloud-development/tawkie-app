@@ -76,8 +76,9 @@ class BackgroundPush {
         .listen((s) => _onClearingPush(getFromServer: false));
     firebase?.setListeners(
       onMessage: (message) {
+        var appId = AppConfig.pushNotificationsAppId;
         message['devices'] = [
-          {'app_id': 'fr.tawkie.app', 'pushkey': 'bogus'}
+          {'app_id': appId, 'pushkey': 'bogus'}
         ];
         pushHelper(
           PushNotification.fromJson(
