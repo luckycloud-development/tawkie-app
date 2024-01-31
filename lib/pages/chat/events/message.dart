@@ -81,6 +81,16 @@ class Message extends StatelessWidget {
       return VerificationRequestContent(event: event, timeline: timeline);
     }
 
+    bool hasSocialMediaParticipant(List<Event> events) {
+      // Social network verification logic for specific events
+      return events.any((event) {
+        final String participantId = event.senderId.toLowerCase();
+        return participantId.contains('@instagram') ||
+            participantId.contains('@whatsapp') ||
+            participantId.contains('@facebook');
+      });
+    }
+
     bool sameOriginServerTs(
         Event? event, Event? nextEvent, Event? nextNextEvent) {
       if (event == null || nextEvent == null || nextNextEvent == null) {
@@ -360,7 +370,9 @@ class Message extends StatelessWidget {
                                         );
                                       },
                                     ),
-                                  groupedEvents.isNotEmpty
+                                  groupedEvents.isNotEmpty &&
+                                          hasSocialMediaParticipant(
+                                              groupedEvents)
                                       ? MergedMessageContent(
                                           groupedEvents,
                                           textColor: textColor,
