@@ -59,6 +59,7 @@ abstract class AppConfig {
   static const String pushNotificationsChannelDescription =
       'Push notifications for Tawkie';
   static const String pushNotificationsAppId = 'fr.tawkie.app';
+  static const String pushNotificationsAppIdDebug = 'fr.tawkie.app.debug';
   static const String pushNotificationsGatewayUrl =
       'https://push.tawkie.fr/_matrix/push/v1/notify';
   static const String pushNotificationsPusherFormat = 'event_id_only';

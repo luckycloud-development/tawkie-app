@@ -70,13 +70,16 @@ class BackgroundPush {
 
   bool upAction = false;
 
+  var appId = kReleaseMode
+      ? AppConfig.pushNotificationsAppId
+      : AppConfig.pushNotificationsAppIdDebug;
+
   BackgroundPush._(this.client) {
     onRoomSync ??= client.onSync.stream
         .where((s) => s.hasRoomUpdate)
         .listen((s) => _onClearingPush(getFromServer: false));
     firebase?.setListeners(
       onMessage: (message) {
-        var appId = AppConfig.pushNotificationsAppId;
         message['devices'] = [
           {'app_id': appId, 'pushkey': 'bogus'}
         ];
@@ -156,7 +159,7 @@ class BackgroundPush {
         [];
     var setNewPusher = false;
     // Just the plain app id, we add the .data_message suffix later
-    var appId = AppConfig.pushNotificationsAppId;
+    //var appId = AppConfig.pushNotificationsAppId;
     // we need the deviceAppId to remove potential legacy UP pusher
     var deviceAppId = '$appId.${client.deviceID}';
     // appId may only be up to 64 chars as per spec
