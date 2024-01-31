@@ -4,7 +4,7 @@ import 'package:matrix/matrix.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/config/themes.dart';
-import 'package:tawkie/pages/chat/events/merge_message_content.dart';
+import 'package:tawkie/pages/chat/events/merged_message_content.dart';
 import 'package:tawkie/pages/chat/events/message_reactions.dart';
 import 'package:tawkie/utils/date_time_extension.dart';
 import 'package:tawkie/utils/platform_infos.dart';
@@ -21,7 +21,7 @@ import 'verification_request_content.dart';
 class Message extends StatelessWidget {
   final Event event;
   final Event? nextEvent;
-  final Event? nextNextEvent;
+  final Event? thirdEvent;
   final Event? previousEvent;
   final bool displayReadMarker;
   final void Function(Event) onTab;
@@ -42,7 +42,7 @@ class Message extends StatelessWidget {
   const Message(
     this.event, {
     this.nextEvent,
-    this.nextNextEvent,
+    this.thirdEvent,
     this.previousEvent,
     this.displayReadMarker = false,
     this.longPressSelect = false,
@@ -81,7 +81,7 @@ class Message extends StatelessWidget {
       return VerificationRequestContent(event: event, timeline: timeline);
     }
 
-    bool haveSameOriginServerTs(
+    bool sameOriginServerTs(
         Event? event, Event? nextEvent, Event? nextNextEvent) {
       if (event == null || nextEvent == null || nextNextEvent == null) {
         return false;
@@ -91,32 +91,32 @@ class Message extends StatelessWidget {
     }
 
     List<Event> createEventGroup() {
-      return [event, nextEvent, nextNextEvent]
+      return [event, nextEvent, thirdEvent]
           .where((e) => e != null)
           .cast<Event>()
           .toList();
     }
 
     bool shouldGroupEvents() {
-      return haveSameOriginServerTs(event, nextEvent, nextNextEvent);
+      return sameOriginServerTs(event, nextEvent, thirdEvent);
     }
 
-    bool haveSamePreviousOriginServerTs(Event? event, Event? previousEvent) {
-      if (event == null || previousEvent == null) {
+    bool haveSamePreviousOriginServerTs(
+        Event? currentEvent, Event? previousEvent) {
+      if (currentEvent == null || previousEvent == null) {
         return false;
       }
-      return event.originServerTs == previousEvent.originServerTs;
+      return currentEvent.originServerTs == previousEvent.originServerTs;
     }
 
     bool shouldHideEvent() {
       return haveSamePreviousOriginServerTs(event, previousEvent);
     }
 
-    final bool hideEvent = shouldHideEvent();
+    final bool isHidden = shouldHideEvent();
 
-    if (hideEvent) {
-      return SizedBox
-          .shrink(); // Ou retournez un autre widget pour masquer l'événement
+    if (isHidden) {
+      return const SizedBox.shrink();
     }
 
     final List<Event> groupedEvents =
@@ -361,7 +361,7 @@ class Message extends StatelessWidget {
                                       },
                                     ),
                                   groupedEvents.isNotEmpty
-                                      ? MergeMessageContent(groupedEvents)
+                                      ? MergedMessageContent(groupedEvents)
                                       : MessageContent(
                                           displayEvent,
                                           textColor: textColor,

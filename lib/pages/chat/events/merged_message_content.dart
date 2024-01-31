@@ -4,10 +4,10 @@ import 'package:matrix/matrix.dart';
 import 'package:tawkie/pages/chat/events/message_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MergeMessageContent extends StatelessWidget {
+class MergedMessageContent extends StatelessWidget {
   final List<Event> events;
 
-  const MergeMessageContent(this.events, {super.key});
+  const MergedMessageContent(this.events, {super.key});
 
   @override
   Widget build(BuildContext context) {
