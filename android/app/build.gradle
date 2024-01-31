@@ -50,7 +50,6 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        resValue "string", "google_app_id", "fr.tawkie.app"
     }
 
     signingConfigs {
