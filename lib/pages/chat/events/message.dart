@@ -13,6 +13,7 @@ import 'package:tawkie/widgets/avatar.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:vibration/vibration.dart';
 
+import '../../../config/socialNetwork.dart';
 import 'message_content.dart';
 import 'reply_content.dart';
 import 'state_message.dart';
@@ -85,9 +86,9 @@ class Message extends StatelessWidget {
       // Social network verification logic for specific events
       return events.any((event) {
         final String participantId = event.senderId.toLowerCase();
-        return participantId.contains('@instagram') ||
-            participantId.contains('@whatsapp') ||
-            participantId.contains('@facebook');
+        return participantId.contains(SocialMediaIdentifiers.instagram) ||
+            participantId.contains(SocialMediaIdentifiers.whatsapp) ||
+            participantId.contains(SocialMediaIdentifiers.facebook);
       });
     }
 

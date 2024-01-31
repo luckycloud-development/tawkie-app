@@ -14,6 +14,8 @@ import 'package:tawkie/widgets/avatar.dart';
 import 'package:tawkie/widgets/hover_builder.dart';
 import 'package:tawkie/widgets/matrix.dart';
 
+import '../../config/socialNetwork.dart';
+
 enum ArchivedRoomAction { delete, rejoin }
 
 class ChatListItem extends StatelessWidget {
@@ -196,15 +198,18 @@ class ChatListItem extends StatelessWidget {
     );
 
     bool containsFacebook(List<String> participantsIds) {
-      return participantsIds.any((id) => id.contains('@facebook'));
+      return participantsIds
+          .any((id) => id.contains(SocialMediaIdentifiers.facebook));
     }
 
     bool containsInstagram(List<String> participantsIds) {
-      return participantsIds.any((id) => id.contains('@instagram_'));
+      return participantsIds
+          .any((id) => id.contains(SocialMediaIdentifiers.instagram));
     }
 
     bool containsWhatsApp(List<String> participantsIds) {
-      return participantsIds.any((id) => id.contains('@whatsapp'));
+      return participantsIds
+          .any((id) => id.contains(SocialMediaIdentifiers.whatsapp));
     }
 
     void removeFacebookTag() {
