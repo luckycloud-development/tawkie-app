@@ -361,7 +361,12 @@ class Message extends StatelessWidget {
                                       },
                                     ),
                                   groupedEvents.isNotEmpty
-                                      ? MergedMessageContent(groupedEvents)
+                                      ? MergedMessageContent(
+                                          groupedEvents,
+                                          textColor: textColor,
+                                          onInfoTab: onInfoTab,
+                                          borderRadius: borderRadius,
+                                        )
                                       : MessageContent(
                                           displayEvent,
                                           textColor: textColor,

@@ -6,8 +6,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MergedMessageContent extends StatelessWidget {
   final List<Event> events;
+  final Color textColor;
+  final void Function(Event)? onInfoTab;
+  final BorderRadius borderRadius;
 
-  const MergedMessageContent(this.events, {super.key});
+  const MergedMessageContent(
+    this.events, {
+    this.onInfoTab,
+    super.key,
+    required this.textColor,
+    required this.borderRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +41,8 @@ class MergedMessageContent extends StatelessWidget {
         ...eventsToDisplay.map(
           (event) => MessageContent(
             event,
-            textColor: Colors.black,
-            borderRadius: BorderRadius.zero,
+            textColor: textColor,
+            borderRadius: borderRadius,
           ),
         ),
         // Display the text only if it's not just a URL
