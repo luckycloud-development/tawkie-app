@@ -13,35 +13,31 @@ class CustomBottomBar extends StatelessWidget {
         children: [
           // ListView.builder for existing filter list
           Expanded(
-            child: Scrollbar(
-              // thumbVisibility: true,
-              thickness: 1.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: filtersTawkie.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          filtersTawkie[index].icon,
-                          color: Colors.white,
-                        ),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: filtersTawkie.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1.5,
                       ),
                     ),
-                  );
-                },
-              ),
+                    child: Center(
+                      child: Icon(
+                        filtersTawkie[index].icon,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
