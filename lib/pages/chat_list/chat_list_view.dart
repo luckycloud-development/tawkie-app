@@ -7,6 +7,7 @@ import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/config/themes.dart';
 import 'package:tawkie/pages/chat_list/chat_list.dart';
+import 'package:tawkie/pages/chat_list/custom_bottom_bar.dart';
 import 'package:tawkie/pages/chat_list/navi_rail_item.dart';
 import 'package:tawkie/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:tawkie/widgets/avatar.dart';
@@ -15,45 +16,6 @@ import 'package:tawkie/widgets/unread_rooms_badge.dart';
 
 import 'chat_list_body.dart';
 import 'start_chat_fab.dart';
-
-class CustomBottomBar extends StatelessWidget {
-  const CustomBottomBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      color: Theme.of(context).colorScheme.background, // Background color
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          // Padding around each CircleAvatar to add space
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.5,
-                ),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.person,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class ChatListView extends StatelessWidget {
   final ChatListController controller;
@@ -223,7 +185,7 @@ class ChatListView extends StatelessWidget {
                   child: Scaffold(
                     body: ChatListViewBody(controller),
                     bottomNavigationBar: controller.displayNavigationBar
-                        ? CustomBottomBar()
+                        ? const CustomBottomBar()
                         : null,
                     floatingActionButton: KeyBoardShortcuts(
                       keysToPress: {
