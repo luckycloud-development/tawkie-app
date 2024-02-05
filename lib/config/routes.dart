@@ -14,6 +14,7 @@ import 'package:tawkie/pages/chat_list/chat_list.dart';
 import 'package:tawkie/pages/chat_members/chat_members.dart';
 import 'package:tawkie/pages/chat_permissions_settings/chat_permissions_settings.dart';
 import 'package:tawkie/pages/device_settings/device_settings.dart';
+import 'package:tawkie/pages/filters_tawkie/filters_list_setting.dart';
 import 'package:tawkie/pages/homeserver_picker/homeserver_picker.dart';
 import 'package:tawkie/pages/invitation_selection/invitation_selection.dart';
 import 'package:tawkie/pages/login/login.dart';
@@ -152,6 +153,16 @@ abstract class AppRoutes {
               pageBuilder: (context, state) => defaultPageBuilder(
                 context,
                 const NewSpace(),
+              ),
+              redirect: loggedOutRedirect,
+            ),
+            // Route for filters Tawkie
+            // Path: rooms/filters_list_setting
+            GoRoute(
+              path: 'filters_list_setting',
+              pageBuilder: (context, state) => defaultPageBuilder(
+                context,
+                const FiltersListSetting(),
               ),
               redirect: loggedOutRedirect,
             ),
