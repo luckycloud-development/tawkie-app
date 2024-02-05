@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tawkie/pages/chat_list/models/filters_tawkie.dart';
 
 class CustomBottomBar extends StatelessWidget {
   const CustomBottomBar({super.key});
@@ -13,14 +14,14 @@ class CustomBottomBar extends StatelessWidget {
           // ListView.builder for existing filter list
           Expanded(
             child: Scrollbar(
-              thumbVisibility: true,
+              // thumbVisibility: true,
               thickness: 1.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: 6,
+                itemCount: filtersTawkie.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Container(
                       width: 40,
                       height: 40,
@@ -31,9 +32,9 @@ class CustomBottomBar extends StatelessWidget {
                           width: 1.5,
                         ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
-                          Icons.person,
+                          filtersTawkie[index].icon,
                           color: Colors.white,
                         ),
                       ),
