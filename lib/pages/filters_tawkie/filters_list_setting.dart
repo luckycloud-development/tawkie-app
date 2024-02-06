@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class FiltersListSetting extends StatelessWidget {
+class FiltersListSetting extends StatefulWidget {
   const FiltersListSetting({super.key});
+
+  @override
+  State<FiltersListSetting> createState() => _FiltersListSettingState();
+}
+
+class _FiltersListSettingState extends State<FiltersListSetting> {
+  int selectedFilterIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,13 @@ class FiltersListSetting extends StatelessWidget {
           String title = 'Item $index';
           bool isOn = index.isEven; // Alternating On/Off states
 
-          return ListTile(
+          return
+            ListTile(
+            onTap: (){
+              setState(() {
+                selectedFilterIndex = index;
+              });
+            },
             leading: const CircleAvatar(
               backgroundColor: Colors.blue,
               child: Icon(Icons.person),
