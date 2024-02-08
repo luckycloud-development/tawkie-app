@@ -185,7 +185,11 @@ class ChatListView extends StatelessWidget {
                   child: Scaffold(
                     body: ChatListViewBody(controller),
                     bottomNavigationBar: controller.displayNavigationBar
-                        ? const CustomBottomBar()
+                        ? CustomBottomBar(
+                      controller,
+                      scrollController: controller.scrollController,
+                      key: Key(controller.activeSpaceId ?? 'Spaces'),
+                    )
                         : null,
                     floatingActionButton: KeyBoardShortcuts(
                       keysToPress: {
