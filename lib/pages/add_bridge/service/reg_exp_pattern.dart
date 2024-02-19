@@ -33,6 +33,12 @@ class PingPatterns {
   static RegExp facebookNotLoggedMatch =
       RegExp(r"That command requires you to be logged in.");
   static RegExp facebookDisconnectMatch = RegExp(r"Successfully logged out");
+
+  // Discord
+  static RegExp discordOnlineMatch = RegExp(r"You're logged in");
+  static RegExp discordSuccessfullyMatch = RegExp(r"Successfully logged in");
+  static RegExp discordNotLoggedMatch = RegExp(r"You're not logged in");
+  static RegExp discordDisconnectMatch = RegExp(r"Logged out successfully.");
 }
 
 // For login response

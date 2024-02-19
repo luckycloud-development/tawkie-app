@@ -124,7 +124,13 @@ class BotBridgeConnection {
 
   // Ping function for each bot
   Future<String> pingSocialNetwork(SocialNetwork socialNetwork) async {
-    final String botUserId = '${socialNetwork.chatBot}$hostname';
+    String? botUserId;
+
+    if (socialNetwork.name == "Discord") {
+      botUserId = socialNetwork.chatBot;
+    } else {
+      botUserId = '${socialNetwork.chatBot}$hostname';
+    }
 
     // Messages to spot when we're online
     RegExp? onlineMatch;
@@ -165,6 +171,12 @@ class BotBridgeConnection {
         disconnectMatch = PingPatterns.instagramDisconnectMatch;
         mQTTNotMatch = PingPatterns.instagramMQTTNotMatch;
         break;
+      case "Discord":
+        onlineMatch = PingPatterns.discordOnlineMatch;
+        successfullyMatch = PingPatterns.discordSuccessfullyMatch;
+        notLoggedMatch = PingPatterns.discordNotLoggedMatch;
+        disconnectMatch = PingPatterns.discordDisconnectMatch;
+        break;
       default:
         throw Exception("Unsupported social network: ${socialNetwork.name}");
     }
@@ -176,9 +188,9 @@ class BotBridgeConnection {
     final Room? roomBot = client.getRoomById(directChat);
 
     // Send the "ping" message to the bot
-    try{
+    try {
       await roomBot?.sendTextEvent("ping");
-    }catch(error){
+    } catch (error) {
       Logs().i('Error: $error');
     }
 
@@ -195,55 +207,64 @@ class BotBridgeConnection {
       final GetRoomEventsResponse response = await client.getRoomEvents(
         directChat,
         Direction.b, // To get the latest messages
-        limit: 1, // Number of messages to obtain
+        limit: 2, // Number of messages to obtain
       );
 
-      final List<MatrixEvent> latestMessages = response.chunk ?? [];
+      final List<MatrixEvent> latestMessages = response.chunk;
+      MatrixEvent? latestMessage;
 
+      // Check if the social network is Discord
+      if (socialNetwork.name == "Discord" && latestMessages.length >= 2) {
+        // If this is the case and there are at least two messages, take the penultimate one
+        latestMessage = latestMessages.last;
+      } else if (latestMessages.isNotEmpty) {
+        // Otherwise, just continue to take the last message as usual.
+        latestMessage = latestMessages.first;
+      }
       if (latestMessages.isNotEmpty) {
-        final String latestMessage =
-            latestMessages.first.content['body'].toString() ?? '';
+        if (latestMessage != null &&
+            latestMessage.content.containsKey('body')) {
+          final String latestMessageToString =
+              latestMessage.content['body'].toString();
 
-        // To find out if we're connected
-        if (onlineMatch.hasMatch(latestMessage) ||
-            alreadySuccessMatch?.hasMatch(latestMessage) == true ||
-            successfullyMatch.hasMatch(latestMessage) == true ||
-            syncCompleteMatch?.hasMatch(latestMessage) == true) {
-          Logs().v("You're logged to ${socialNetwork.name}");
+          // To find out if we're connected
+          if (onlineMatch.hasMatch(latestMessageToString) ||
+              alreadySuccessMatch?.hasMatch(latestMessageToString) == true ||
+              successfullyMatch.hasMatch(latestMessageToString) == true ||
+              syncCompleteMatch?.hasMatch(latestMessageToString) == true) {
+            Logs().v("You're logged to ${socialNetwork.name}");
 
-          result = 'Connected';
+            result = 'Connected';
 
-          break; // Exit the loop if the bridge is connected
-        } else if (notLoggedMatch.hasMatch(latestMessage) == true ||
-            disconnectMatch.hasMatch(latestMessage) == true ||
-            connectedButNotLoggedMatch?.hasMatch(latestMessage) == true) {
-          Logs().v('Not connected to ${socialNetwork.name}');
+            break; // Exit the loop if the bridge is connected
+          } else if (notLoggedMatch.hasMatch(latestMessageToString) == true ||
+              disconnectMatch.hasMatch(latestMessageToString) == true ||
+              connectedButNotLoggedMatch?.hasMatch(latestMessageToString) ==
+                  true) {
+            Logs().v('Not connected to ${socialNetwork.name}');
 
-          result = 'Not Connected';
+            result = 'Not Connected';
 
-          break; // Exit the loop if the bridge is disconnected
-        } else if (mQTTNotMatch.hasMatch(latestMessage) == true) {
-          String eventToSend;
+            break; // Exit the loop if the bridge is disconnected
+          } else if (mQTTNotMatch?.hasMatch(latestMessageToString) == true) {
+            String eventToSend;
 
-          switch (socialNetwork.name) {
-            case "WhatsApp":
-              eventToSend = "reconnect";
-              break;
-            default:
-              eventToSend = "connect";
-              break;
+            switch (socialNetwork.name) {
+              case "WhatsApp":
+                eventToSend = "reconnect";
+                break;
+              default:
+                eventToSend = "connect";
+                break;
+            }
+
+            await roomBot?.sendTextEvent(eventToSend);
+
+            await Future.delayed(const Duration(seconds: 3)); // Wait sec
           }
-
-          await roomBot?.sendTextEvent(eventToSend);
-
-          await Future.delayed(const Duration(seconds: 3)); // Wait sec
-        } else {
-          // If no new message is received from the bot, we send back a ping
-          // Or no expected answer is found
-          await roomBot?.sendTextEvent("ping");
-          await Future.delayed(const Duration(seconds: 2)); // Wait sec
         }
       }
+      await Future.delayed(const Duration(seconds: 2)); // Wait sec
       currentIteration++;
     }
 

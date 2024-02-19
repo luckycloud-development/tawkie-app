@@ -35,7 +35,7 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Ce code sera exécuté après que le premier rendu de la frame soit terminé
+      // This code will be executed after the first frame rendering has been completed.
 
       final client = Matrix.of(context).client;
       final String fullUrl = client.homeserver!.host;
@@ -217,7 +217,6 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
               botConnection,
             );
             break;
-
           // For other networks
         }
         if (success) {
