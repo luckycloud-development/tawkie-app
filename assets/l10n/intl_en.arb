@@ -2540,5 +2540,8 @@
     "loading_disconnectionSuccess": "Successful logout",
     "loading_deleteRoom": "Delete the conversation...",
     "loading_deleteRoomSuccess": "Conversation deleted",
-    "refreshList": "Refresh list"
+    "refreshList": "Refresh list",
+    "discord_connectionTitle": "Connect to Discord",
+    "discord_connectToQrCode": "Login via QR code",
+    "discord_connectUsernamePassword": "Login with your username and password"
 }

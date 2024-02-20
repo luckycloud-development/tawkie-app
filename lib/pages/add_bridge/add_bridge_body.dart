@@ -12,6 +12,7 @@ import 'package:tawkie/widgets/matrix.dart';
 
 import 'add_bridge_header.dart';
 import 'connection_bridge_dialog.dart';
+import 'discordConnection.dart';
 import 'error_message_dialog.dart';
 import 'model/social_network.dart';
 
@@ -217,6 +218,11 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
               botConnection,
             );
             break;
+          case "Discord":
+            // Trying to connect to Discord
+            success = await navigateToDiscordConnection(context);
+            break;
+
           // For other networks
         }
         if (success) {
@@ -304,4 +310,14 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
       }
     }
   }
+}
+
+// Navigation function for different Discord connection options
+Future<bool> navigateToDiscordConnection(BuildContext context) async {
+  return await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const DiscordConnection(),
+    ),
+  );
 }
