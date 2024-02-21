@@ -13,8 +13,6 @@ class DiscordConnection extends StatelessWidget {
   final BotBridgeConnection botConnection;
   final SocialNetwork network;
 
-  final Completer<bool> completer = Completer<bool>();
-
   DiscordConnection(
       {super.key, required this.botConnection, required this.network});
 
@@ -43,18 +41,17 @@ class DiscordConnection extends StatelessWidget {
 
                 if (discordResult != null) {
                   // ShowDialog for code and QR Code login
-                  final bool success = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QRCodeConnectPage(
-                            qrCode: discordResult!.qrCode!,
-                            code: discordResult!.urlLink!,
-                            botConnection: botConnection,
-                            socialNetwork: network,
-                          ),
-                        ),
-                      ) ??
-                      false;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QRCodeConnectPage(
+                        qrCode: discordResult!.qrCode!,
+                        code: discordResult!.urlLink!,
+                        botConnection: botConnection,
+                        socialNetwork: network,
+                      ),
+                    ),
+                  );
                 }
               } catch (e) {
                 Navigator.of(context).pop();

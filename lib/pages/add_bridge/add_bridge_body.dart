@@ -207,11 +207,11 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
             );
             break;
           case "WhatsApp":
-            // Trying to connect to Instagram
+            // Trying to connect to WhatsApp
             success = await connectToWhatsApp(context, network, botConnection);
             break;
           case "Facebook Messenger":
-            // Trying to connect
+            // Trying to connect to Facebook Messenger
             success = await connectWithTwoFields(
               context,
               network,
@@ -220,8 +220,16 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
             break;
           case "Discord":
             // Trying to connect to Discord
-            success = await navigateToDiscordConnection(
-                context, botConnection, network);
+            success = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DiscordConnection(
+                  botConnection: botConnection,
+                  network: network,
+                ),
+              ),
+            );
+            break;
             break;
 
           // For other networks
@@ -311,18 +319,4 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
       }
     }
   }
-}
-
-// Navigation function for different Discord connection options
-Future<bool> navigateToDiscordConnection(BuildContext context,
-    BotBridgeConnection botConnection, SocialNetwork network) async {
-  return await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => DiscordConnection(
-        botConnection: botConnection,
-        network: network,
-      ),
-    ),
-  );
 }
