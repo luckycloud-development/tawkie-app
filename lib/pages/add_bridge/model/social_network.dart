@@ -62,3 +62,12 @@ class WhatsAppResult {
 
   WhatsAppResult(this.result, this.code, this.qrCode);
 }
+
+// Model for Discord message response
+class DiscordResult {
+  final String result;
+  final String? urlLink;
+  final String? qrCode;
+
+  DiscordResult(this.result, this.urlLink, this.qrCode);
+}

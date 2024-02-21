@@ -220,7 +220,8 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
             break;
           case "Discord":
             // Trying to connect to Discord
-            success = await navigateToDiscordConnection(context);
+            success = await navigateToDiscordConnection(
+                context, botConnection, network);
             break;
 
           // For other networks
@@ -313,11 +314,15 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
 }
 
 // Navigation function for different Discord connection options
-Future<bool> navigateToDiscordConnection(BuildContext context) async {
+Future<bool> navigateToDiscordConnection(BuildContext context,
+    BotBridgeConnection botConnection, SocialNetwork network) async {
   return await Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => const DiscordConnection(),
+      builder: (context) => DiscordConnection(
+        botConnection: botConnection,
+        network: network,
+      ),
     ),
   );
 }

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:tawkie/pages/add_bridge/error_message_dialog.dart';
-import 'package:tawkie/pages/add_bridge/model/social_network.dart';
-import 'package:tawkie/pages/add_bridge/service/reg_exp_pattern.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
+import 'package:tawkie/pages/add_bridge/error_message_dialog.dart';
+import 'package:tawkie/pages/add_bridge/model/social_network.dart';
+import 'package:tawkie/pages/add_bridge/service/reg_exp_pattern.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
 
 // For all bot bridge conversations
@@ -622,59 +622,81 @@ class BotBridgeConnection {
     return result;
   }
 
-  Future<String> fetchDataWhatsApp() async {
-    final String botUserId = '@whatsappbot:$hostname';
+  Future<String> fetchData(SocialNetwork network) async {
+    String? botUserId;
+
+    switch (network.name) {
+      case "Discord":
+        botUserId = network.chatBot;
+        break;
+      case "WhatsApp":
+        botUserId = '@whatsappbot:$hostname';
+        break;
+    }
 
     // Success phrases to spot
-    final RegExp successMatch = LoginRegex.whatsAppSuccessMatch;
+    RegExp? successMatch;
 
     // Error phrase to spot
-    final RegExp timeOutMatch = LoginRegex.whatsAppTimeoutMatch;
+    RegExp? timeOutMatch;
 
-    // Add a direct chat with the Instagram bot (if you haven't already)
-    String? directChat = client.getDirectChatFromUserId(botUserId);
-    directChat ??= await client.startDirectChat(botUserId);
+    switch (network.name) {
+      case "Discord":
+        successMatch = LoginRegex.discordSuccessMatch;
+        timeOutMatch = LoginRegex.discordTimeoutMatch;
+        break;
+      case "WhatsApp":
+        successMatch = LoginRegex.whatsAppSuccessMatch;
+        timeOutMatch = LoginRegex.whatsAppTimeoutMatch;
+        break;
+    }
 
     String result =
         "Not logged"; // Variable to track the result of the connection
 
-    // Get the latest messages from the room (limited to the specified message or stopProgress)
-    while (continueProcess && true) {
-      final GetRoomEventsResponse response = await client.getRoomEvents(
-        directChat,
-        Direction.b, // To get the latest messages
-        limit: 3, // Number of messages to obtain (3 instead of 2)
-      );
+    if (botUserId != null) {
+      // Add a direct chat with the Instagram bot (if you haven't already)
+      String? directChat = client.getDirectChatFromUserId(botUserId);
+      directChat ??= await client.startDirectChat(botUserId);
 
-      final List<MatrixEvent> latestMessages = response.chunk ?? [];
+      // Get the latest messages from the room (limited to the specified message or stopProgress)
+      while (continueProcess && true) {
+        final GetRoomEventsResponse response = await client.getRoomEvents(
+          directChat,
+          Direction.b, // To get the latest messages
+          limit: 3, // Number of messages to obtain (3 instead of 2)
+        );
 
-      // Check the last three messages
-      for (int i = latestMessages.length - 1; i >= 0; i--) {
-        final String messageBody =
-            latestMessages[i].content['body'].toString() ?? '';
+        final List<MatrixEvent> latestMessages = response.chunk ?? [];
 
-        if (successMatch.hasMatch(messageBody)) {
-          Logs().v("You're logged to WhatsApp");
-          result = "success";
-          break;
-        } else if (timeOutMatch.hasMatch(messageBody)) {
-          Logs().v("Login timed out");
-          result = "loginTimedOut";
-          break;
-        } else if (!successMatch.hasMatch(messageBody) &&
-            !timeOutMatch.hasMatch(messageBody)) {
-          Logs().v("waiting");
-          await Future.delayed(const Duration(seconds: 2)); // Wait sec
+        // Check the last three messages
+        for (int i = latestMessages.length - 1; i >= 0; i--) {
+          final String messageBody =
+              latestMessages[i].content['body'].toString() ?? '';
+
+          if (successMatch!.hasMatch(messageBody)) {
+            Logs().v("You're logged to ${network.name}");
+            result = "success";
+            break;
+          } else if (timeOutMatch!.hasMatch(messageBody)) {
+            Logs().v("Login timed out");
+            result = "loginTimedOut";
+            break;
+          } else if (!successMatch.hasMatch(messageBody) &&
+              !timeOutMatch.hasMatch(messageBody)) {
+            Logs().v("waiting");
+            await Future.delayed(const Duration(seconds: 2)); // Wait sec
+          }
         }
-      }
 
-      if (continueProcess == false) {
-        Logs().v("Stop listening");
-        result = "Stop Listening";
-      }
+        if (continueProcess == false) {
+          Logs().v("Stop listening");
+          result = "Stop Listening";
+        }
 
-      if (result != "Not logged") {
-        break; // Exit the loop once a result is determined
+        if (result != "Not logged") {
+          break; // Exit the loop once a result is determined
+        }
       }
     }
 
@@ -862,5 +884,72 @@ class BotBridgeConnection {
       Logs().v("Error pinging: $error");
       rethrow;
     }
+  }
+
+  // Discord
+  // Function for create and login bridge with QR Code Discord
+  Future<DiscordResult> createBridgeDiscordQRCode(
+      BuildContext context, SocialNetwork network) async {
+    // Element corresponding to the Discord social network
+    final String botUserId = network.chatBot;
+
+    // Success phrases to spot
+    final RegExp successMatch = LoginRegex.discordSuccessMatch;
+    final RegExp alreadySuccessMatch = LoginRegex.discordAlreadySuccessMatch;
+
+    // Error phrase to spot
+    final RegExp timeOutMatch = LoginRegex.discordTimeoutMatch;
+
+    // Add a direct chat with the bot (if you haven't already)
+    String? directChat = client.getDirectChatFromUserId(botUserId);
+    directChat ??= await client.startDirectChat(botUserId);
+
+    final Room? roomBot = client.getRoomById(directChat);
+
+    // Send the "login" message to the bot
+    await roomBot?.sendTextEvent("login-qr");
+    await Future.delayed(const Duration(seconds: 3)); // Wait sec
+
+    DiscordResult result; // Variable to track the result of the QR Code
+
+    // Get the latest messages from the room (limited to the specified number)
+    while (true) {
+      final GetRoomEventsResponse response = await client.getRoomEvents(
+        directChat,
+        Direction.b, // To get the latest messages
+        limit: 2, // Number of messages to obtain
+      );
+
+      final List<MatrixEvent> latestMessages = response.chunk;
+
+      final String latestMessageBody =
+          latestMessages.first.content['body'].toString();
+
+      final String urlQRCode = latestMessages.first.content['url'].toString();
+
+      if (latestMessages.isNotEmpty) {
+        if (successMatch.hasMatch(latestMessageBody) ||
+            alreadySuccessMatch.hasMatch(latestMessageBody)) {
+          Logs().v("You're already logged to Discord");
+
+          result = DiscordResult("Connected", "", "");
+
+          break; // Exit the loop once the "login" message has been sent and is success
+        } else if (timeOutMatch.hasMatch(latestMessageBody)) {
+          Logs().v("Login timed out");
+
+          result = DiscordResult("Time out", "", "");
+
+          break;
+        } else {
+          Logs().v("scanTheCode");
+
+          result = DiscordResult("scanTheCode", latestMessageBody, urlQRCode);
+
+          break;
+        }
+      }
+    }
+    return result;
   }
 }

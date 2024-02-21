@@ -85,6 +85,13 @@ class LoginRegex {
       RegExp(r"You're already logged in");
   static final RegExp facebookIncorrectTwoFactorMatch =
       RegExp(r"Incorrect two-factor authentication code. Please try again");
+
+  // Discord
+  static final RegExp discordSuccessMatch = RegExp(r"Successfully logged in");
+  static final RegExp discordAlreadySuccessMatch =
+      RegExp(r"You're already logged in");
+  static final RegExp discordTimeoutMatch =
+      RegExp(r"Error logging in: websocket: close sent");
 }
 
 // For logout response
