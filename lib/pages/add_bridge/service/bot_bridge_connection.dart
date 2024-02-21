@@ -284,7 +284,13 @@ class BotBridgeConnection {
   // Function to logout
   Future<String> disconnectFromNetwork(BuildContext context,
       SocialNetwork network, ConnectionStateModel connectionState) async {
-    final String botUserId = '${network.chatBot}$hostname';
+    String botUserId;
+
+    if (network.name == 'Discord') {
+      botUserId = network.chatBot;
+    } else {
+      botUserId = '${network.chatBot}$hostname';
+    }
 
     Future.microtask(() {
       connectionState.updateConnectionTitle(
@@ -308,6 +314,11 @@ class BotBridgeConnection {
         successMatch = LogoutRegex.facebookSuccessMatch;
         alreadyLogoutMatch = LogoutRegex.facebookAlreadyLogoutMatch;
         break;
+      case 'Discord':
+        successMatch = LogoutRegex.discordSuccessMatch;
+        alreadyLogoutMatch = LogoutRegex.discordAlreadyLogoutMatch;
+        break;
+
       default:
         throw ArgumentError('Unsupported network: ${network.name}');
     }
@@ -355,23 +366,36 @@ class BotBridgeConnection {
         final GetRoomEventsResponse response = await client.getRoomEvents(
           directChat,
           Direction.b, // To get the latest messages
-          limit: 1, // Number of messages to obtain
+          limit: 2, // Number of messages to obtain
         );
 
         final List<MatrixEvent> latestMessages = response.chunk ?? [];
 
         if (latestMessages.isNotEmpty) {
-          final String latestMessage =
-              latestMessages.first.content['body'].toString() ?? '';
+          MatrixEvent? latestMessage;
+
+          // Check if the social network is Discord
+          if (network.name == "Discord" && latestMessages.length >= 2) {
+            // If this is the case and there are at least two messages, take the penultimate one
+            latestMessage = latestMessages.last;
+          } else if (latestMessages.isNotEmpty) {
+            // Otherwise, just continue to take the last message as usual.
+            latestMessage = latestMessages.first;
+          }
+
+          final String latestMessageToString =
+              latestMessage!.content['body'].toString();
+
+          print("Le dernier message est: $latestMessageToString");
 
           // to find out if we're connected
-          if (!successMatch.hasMatch(latestMessage) &&
-              !alreadyLogoutMatch.hasMatch(latestMessage)) {
+          if (!successMatch.hasMatch(latestMessageToString) &&
+              !alreadyLogoutMatch.hasMatch(latestMessageToString)) {
             Logs().v("You're always connected to ${network.name}");
             result = 'Connected';
             break;
-          } else if (successMatch.hasMatch(latestMessage) ||
-              alreadyLogoutMatch.hasMatch(latestMessage)) {
+          } else if (successMatch.hasMatch(latestMessageToString) ||
+              alreadyLogoutMatch.hasMatch(latestMessageToString)) {
             Logs().v("You're disconnected to ${network.name}");
             result = 'Not Connected';
 
