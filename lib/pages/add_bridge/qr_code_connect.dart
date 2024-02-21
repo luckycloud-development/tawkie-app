@@ -9,7 +9,6 @@ import 'package:tawkie/widgets/mxc_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class QRCodeConnectPage extends StatefulWidget {
-  final MatrixEvent? event;
   final String? qrCode;
   final String? code;
   final BotBridgeConnection botConnection;
@@ -17,7 +16,6 @@ class QRCodeConnectPage extends StatefulWidget {
 
   const QRCodeConnectPage({
     super.key,
-    this.event,
     this.qrCode,
     this.code,
     required this.botConnection,
@@ -53,7 +51,8 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(L10n.of(context)!.whatsApp_qrTitle),
+        title: Text(
+            "${L10n.of(context)!.paringWith} ${widget.socialNetwork.name}"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -92,6 +91,43 @@ class QRExplanation extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget qrWidget;
 
+    // Setting up explanatory sentences according to socialNetwork
+    String qrExplainOne = "";
+    String qrExplainTwo = "";
+    String qrExplainTree = "";
+    String qrExplainFour = "";
+    String qrExplainFive = "";
+    String qrExplainSix = "";
+    String qrExplainSeven = "";
+    String qrExplainEight = "";
+    String qrExplainNine = "";
+
+    switch (network.name) {
+      case "Discord":
+        qrExplainOne = L10n.of(context)!.discord_qrExplainOne;
+        qrExplainTwo = L10n.of(context)!.discord_qrExplainTwo;
+        qrExplainTree = L10n.of(context)!.discord_qrExplainTree;
+        qrExplainFour = L10n.of(context)!.discord_qrExplainFour;
+        qrExplainFive = L10n.of(context)!.discord_qrExplainFive;
+        qrExplainSix = L10n.of(context)!.discord_qrExplainSix;
+        qrExplainSeven = L10n.of(context)!.discord_qrExplainSeven;
+        qrExplainEight = L10n.of(context)!.discord_qrExplainEight;
+        qrExplainNine = L10n.of(context)!.discord_qrExplainNine;
+        break;
+      case "WhatsApp":
+        qrExplainOne = L10n.of(context)!.whatsApp_qrExplainOne;
+        qrExplainTwo = L10n.of(context)!.whatsApp_qrExplainTwo;
+        qrExplainTree = L10n.of(context)!.whatsApp_qrExplainTree;
+        qrExplainFour = L10n.of(context)!.whatsApp_qrExplainFour;
+        qrExplainFive = L10n.of(context)!.whatsApp_qrExplainFive;
+        qrExplainSix = L10n.of(context)!.whatsApp_qrExplainSix;
+        qrExplainSeven = L10n.of(context)!.whatsApp_qrExplainSeven;
+        qrExplainEight = L10n.of(context)!.whatsApp_qrExplainEight;
+        qrExplainNine = L10n.of(context)!.whatsApp_qrExplainNine;
+        break;
+    }
+
+    // Setting up the QR code shape according to SocialNetwork
     switch (network.name) {
       case "Discord":
         qrWidget = MxcImage(
@@ -121,27 +157,27 @@ class QRExplanation extends StatelessWidget {
     return Column(
       children: [
         Text(
-          L10n.of(context)!.whatsApp_qrExplainOne,
+          qrExplainOne,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainTwo,
+          qrExplainTwo,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainTree,
+          qrExplainTree,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainFour,
+          qrExplainFour,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainFive,
+          qrExplainFive,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
@@ -183,30 +219,30 @@ class QRExplanation extends StatelessWidget {
           height: 20,
         ),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainSix,
+          qrExplainSix,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(L10n.of(context)!.whatsApp_qrExplainSeven,
-                style: const TextStyle(
-                  fontSize: 16,
-                )),
             Text(
-              L10n.of(context)!.whatsApp_qrExplainEight,
+              qrExplainSeven,
+              style: const TextStyle(fontSize: 16),
+            ),
+            Text(
+              qrExplainEight,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Text(
-          L10n.of(context)!.whatsApp_qrExplainTen,
+          qrExplainNine,
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
-        qrWidget, //
+        qrWidget, //Location of previously built QR code
       ],
     );
   }

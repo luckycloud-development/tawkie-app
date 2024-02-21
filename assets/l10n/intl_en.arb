@@ -2513,7 +2513,7 @@
   "whatsApp": "WhatsApp",
   "twoFactor_title": "Two-factor authentication",
   "twoFactor_content": "Send the code from your authenticator app here.",
-  "whatsApp_qrTitle": "Pairing with WhatsApp",
+  "paringWith": "Pairing with",
   "whatsApp_qrExplainOne": "On your main phone",
   "whatsApp_qrExplainTwo": "From WhatsApp, tap on the Enter code notification.",
   "whatsApp_qrExplainTree": "Unlock your main phone with your pin code or biometric authentication",
