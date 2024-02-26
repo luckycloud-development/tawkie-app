@@ -7,6 +7,7 @@ import 'package:tawkie/pages/add_bridge/error_message_dialog.dart';
 import 'package:tawkie/pages/add_bridge/model/social_network.dart';
 import 'package:tawkie/pages/add_bridge/service/reg_exp_pattern.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 // For all bot bridge conversations
 class BotBridgeConnection {
@@ -976,4 +977,101 @@ class BotBridgeConnection {
     }
     return result;
   }
+
+  //Function to connect Discord with WebView
+  Future<String> createBridgeDiscord(
+      BuildContext context,
+      WebviewCookieManager cookieManager,
+      ConnectionStateModel connectionState,
+      SocialNetwork network) async {
+    final String botUserId = network.chatBot;
+
+    Future.microtask(() {
+      connectionState
+          .updateConnectionTitle(L10n.of(context)!.loading_demandToConnect);
+    });
+
+    final gotCookies =
+    await cookieManager.getCookies(network.urlRedirect);
+
+    print("VOICI LES COOKIES: $gotCookies");
+    // final formattedCookieString = formatCookies(gotCookies);
+
+    // Success phrases to spot
+    final RegExp successMatch = LoginRegex.discordSuccessMatch;
+    final RegExp alreadySuccessMatch = LoginRegex.discordAlreadySuccessMatch;
+
+    // Add a direct chat with the Instagram bot (if you haven't already)
+    String? directChat = client.getDirectChatFromUserId(botUserId);
+    directChat ??= await client.startDirectChat(botUserId);
+
+    final Room? roomBot = client.getRoomById(directChat);
+
+    // Send the "login" message to the bot
+    //await roomBot?.sendTextEvent("login $formattedCookieString");
+
+    await Future.delayed(const Duration(seconds: 3)); // Wait sec
+
+    Future.microtask(() {
+      connectionState
+          .updateConnectionTitle(L10n.of(context)!.loading_verification);
+    });
+
+    await Future.delayed(const Duration(seconds: 1)); // Wait sec
+
+    String result = ""; // Variable to track the result of the connection
+
+    // variable for loop limit
+    const int maxIterations = 5;
+    int currentIteration = 0;
+
+    // Get the latest messages from the room (limited to the specified number)
+    while (currentIteration < maxIterations) {
+      final GetRoomEventsResponse response = await client.getRoomEvents(
+        directChat,
+        Direction.b, // To get the latest messages
+        limit: 1, // Number of messages to obtain
+      );
+
+      final List<MatrixEvent> latestMessages = response.chunk ?? [];
+      final String latestMessage =
+          latestMessages.first.content['body'].toString() ?? '';
+
+      if (latestMessages.isNotEmpty) {
+        if (successMatch.hasMatch(latestMessage) ||
+            alreadySuccessMatch.hasMatch(latestMessage)) {
+          Logs().v("You're logged to Linkedin");
+
+          result = "success";
+
+          Future.microtask(() {
+            connectionState.updateConnectionTitle(L10n.of(context)!.connected);
+          });
+
+          Future.microtask(() {
+            connectionState.updateLoading(false);
+          });
+
+          await Future.delayed(const Duration(seconds: 1)); // Wait sec
+
+          break; // Exit the loop once the "login" message has been sent and is success
+        }
+      }
+      await Future.delayed(const Duration(seconds: 5)); // Wait 5 sec
+      currentIteration++;
+    }
+
+    if (currentIteration == maxIterations) {
+      Logs().v("Maximum iterations reached, setting result to 'error'");
+
+      result = 'error';
+    }
+
+    Future.microtask(() {
+      connectionState.reset();
+    });
+
+    return result;
+  }
+
 }
