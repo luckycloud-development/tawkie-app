@@ -11,8 +11,9 @@ class DiscordConnection extends StatelessWidget {
   final BotBridgeConnection botConnection;
   final SocialNetwork network;
 
-  DiscordConnection(
-      {super.key, required this.botConnection, required this.network});
+  const DiscordConnection(
+      {Key? key, required this.botConnection, required this.network})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,49 +21,42 @@ class DiscordConnection extends StatelessWidget {
       appBar: AppBar(
         title: Text(L10n.of(context)!.discord_connectionTitle),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          ListTile(
-            title: Text(L10n.of(context)!.discord_connectToQrCode),
-            onTap: () async {
-              try {
-                DiscordResult? discordResult;
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            try {
+              DiscordResult? discordResult;
 
-                await showFutureLoadingDialog(
-                  context: context,
-                  future: () async {
-                    discordResult = await botConnection
-                        .createBridgeDiscordQRCode(context, network);
-                  },
-                );
+              await showFutureLoadingDialog(
+                context: context,
+                future: () async {
+                  discordResult = await botConnection.createBridgeDiscordQRCode(
+                      context, network);
+                },
+              );
 
-                if (discordResult != null) {
-                  // ShowDialog for code and QR Code login
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRCodeConnectPage(
-                        qrCode: discordResult!.qrCode!,
-                        code: discordResult!.urlLink!,
-                        botConnection: botConnection,
-                        socialNetwork: network,
-                      ),
+              if (discordResult != null) {
+                // ShowDialog for code and QR Code login
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QRCodeConnectPage(
+                      qrCode: discordResult!.qrCode!,
+                      code: discordResult!.urlLink!,
+                      botConnection: botConnection,
+                      socialNetwork: network,
                     ),
-                  );
-                }
-              } catch (e) {
-                Navigator.of(context).pop();
-                //To view other catch-related errors
-                showCatchErrorDialog(context, e);
+                  ),
+                );
               }
-            },
-          ),
-          ListTile(
-            title: Text(L10n.of(context)!.discord_connectUsernamePassword),
-            onTap: () {},
-          ),
-        ],
+            } catch (e) {
+              Navigator.of(context).pop();
+              //To view other catch-related errors
+              showCatchErrorDialog(context, e);
+            }
+          },
+          child: Text(L10n.of(context)!.discord_connectToQrCode),
+        ),
       ),
     );
   }

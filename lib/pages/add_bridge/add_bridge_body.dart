@@ -6,6 +6,7 @@ import 'package:tawkie/pages/add_bridge/service/bot_bridge_connection.dart';
 import 'package:tawkie/pages/add_bridge/service/hostname.dart';
 import 'package:tawkie/pages/add_bridge/show_bottom_sheet.dart';
 import 'package:tawkie/pages/add_bridge/success_message.dart';
+import 'package:tawkie/pages/add_bridge/web_view_connection.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/utils/platform_size.dart';
 import 'package:tawkie/widgets/matrix.dart';
@@ -220,18 +221,44 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
             break;
           case "Discord":
             // Trying to connect to Discord
-            success = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DiscordConnection(
-                  botConnection: botConnection,
-                  network: network,
-                ),
-              ),
-            );
-            break;
-            break;
 
+            if (!PlatformInfos.isMobile) {
+              // Redirect to LinkedinConnectionExplain page
+              success = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DiscordConnection(
+                    botConnection: botConnection,
+                    network: network,
+                  ),
+                ),
+              );
+            } else {
+              // Navigate to WebViewConnection and provide callback function
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WebViewConnection(
+                    botBridgeConnection: botConnection,
+                    network: network,
+                    onConnectionResult: (bool success) {
+                      if (success) {
+                        setState(() {
+                          network.connected = true;
+                        });
+                        showCatchSuccessDialog(context,
+                            "${L10n.of(context)!.youAreConnectedTo} ${network.name}");
+                      } else {
+                        // Handle connection failure
+                        showCatchErrorDialog(context,
+                            "${L10n.of(context)!.err_toConnect} ${network.name}");
+                      }
+                    },
+                  ),
+                ),
+              );
+            }
+            break;
           // For other networks
         }
         if (success) {
