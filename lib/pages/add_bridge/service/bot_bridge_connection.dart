@@ -376,19 +376,18 @@ class BotBridgeConnection {
           MatrixEvent? latestMessage;
 
           // Check if the social network is Discord
-          if (network.name == "Discord" && latestMessages.length >= 2) {
+          if (network.name == "Discord") {
             // If this is the case and there are at least two messages, take the penultimate one
             latestMessage = latestMessages.last;
-          } else if (latestMessages.isNotEmpty) {
+          } else {
             // Otherwise, just continue to take the last message as usual.
             latestMessage = latestMessages.first;
           }
 
           final String latestMessageToString =
-              latestMessage!.content['body'].toString();
+              latestMessage.content['body'].toString();
 
-          print("Le dernier message est: $latestMessageToString");
-
+          print('Le dernier message est: $latestMessageToString');
           // to find out if we're connected
           if (!successMatch.hasMatch(latestMessageToString) &&
               !alreadyLogoutMatch.hasMatch(latestMessageToString)) {
@@ -418,6 +417,18 @@ class BotBridgeConnection {
         return 'error';
       }
 
+      await Future.delayed(const Duration(seconds: 1)); // Wait sec
+
+      if (currentIteration == 3) {
+        // Send again the "logout" message to the bot
+        try {
+          await roomBot?.sendTextEvent('logout');
+        } catch (e) {
+          Logs().v('Error sending text event: $e');
+          // Handle the error, you can log it or return an error message
+          return 'error';
+        }
+      }
       currentIteration++;
     }
 
@@ -983,19 +994,14 @@ class BotBridgeConnection {
       BuildContext context,
       WebviewCookieManager cookieManager,
       ConnectionStateModel connectionState,
-      SocialNetwork network) async {
+      SocialNetwork network,
+      String authorizationHeaderValue) async {
     final String botUserId = network.chatBot;
 
     Future.microtask(() {
       connectionState
           .updateConnectionTitle(L10n.of(context)!.loading_demandToConnect);
     });
-
-    final gotCookies =
-    await cookieManager.getCookies(network.urlRedirect);
-
-    print("VOICI LES COOKIES: $gotCookies");
-    // final formattedCookieString = formatCookies(gotCookies);
 
     // Success phrases to spot
     final RegExp successMatch = LoginRegex.discordSuccessMatch;
@@ -1008,7 +1014,7 @@ class BotBridgeConnection {
     final Room? roomBot = client.getRoomById(directChat);
 
     // Send the "login" message to the bot
-    //await roomBot?.sendTextEvent("login $formattedCookieString");
+    await roomBot?.sendTextEvent("login-token user $authorizationHeaderValue");
 
     await Future.delayed(const Duration(seconds: 3)); // Wait sec
 
@@ -1030,17 +1036,17 @@ class BotBridgeConnection {
       final GetRoomEventsResponse response = await client.getRoomEvents(
         directChat,
         Direction.b, // To get the latest messages
-        limit: 1, // Number of messages to obtain
+        limit: 2, // Number of messages to obtain
       );
 
       final List<MatrixEvent> latestMessages = response.chunk ?? [];
       final String latestMessage =
-          latestMessages.first.content['body'].toString() ?? '';
+          latestMessages.last.content['body'].toString() ?? '';
 
       if (latestMessages.isNotEmpty) {
         if (successMatch.hasMatch(latestMessage) ||
             alreadySuccessMatch.hasMatch(latestMessage)) {
-          Logs().v("You're logged to Linkedin");
+          Logs().v("You're logged to Discord");
 
           result = "success";
 
@@ -1052,12 +1058,12 @@ class BotBridgeConnection {
             connectionState.updateLoading(false);
           });
 
-          await Future.delayed(const Duration(seconds: 1)); // Wait sec
+          await Future.delayed(const Duration(seconds: 2)); // Wait sec
 
-          break; // Exit the loop once the "login" message has been sent and is success
+          break;
         }
       }
-      await Future.delayed(const Duration(seconds: 5)); // Wait 5 sec
+      await Future.delayed(const Duration(seconds: 3)); // Wait 5 sec
       currentIteration++;
     }
 
@@ -1073,5 +1079,4 @@ class BotBridgeConnection {
 
     return result;
   }
-
 }
