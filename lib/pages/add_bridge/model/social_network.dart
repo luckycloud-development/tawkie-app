@@ -52,10 +52,11 @@ final List<SocialNetwork> socialNetwork = [
     chatBot: "@whatsappbot:",
   ),
   SocialNetwork(
-    logo: Logo(Logos.discord),
-    name: "Discord",
-    chatBot: "@discordbot:alpha.tawkie.fr",
-  ),
+      logo: Logo(Logos.discord),
+      name: "Discord",
+      chatBot: "@discordbot:alpha.tawkie.fr",
+      urlLogin: "https://discord.com/login",
+      urlRedirect: "https://discord.com/api/v9/science"),
 ];
 
 // Model for WhatsApp message response
