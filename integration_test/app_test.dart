@@ -37,7 +37,7 @@ void main() {
 
       testWidgets(
         'Start app, login and logout',
-        (WidgetTester tester) async {
+            (WidgetTester tester) async {
           app.main();
           await tester.ensureAppStartedHomescreen();
           await tester.ensureLoggedOut();
@@ -46,7 +46,7 @@ void main() {
 
       testWidgets(
         'Login again',
-        (WidgetTester tester) async {
+            (WidgetTester tester) async {
           app.main();
           await tester.ensureAppStartedHomescreen();
         },

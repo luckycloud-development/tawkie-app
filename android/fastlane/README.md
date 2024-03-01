@@ -13,6 +13,17 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### capture_screenshots_android
+
+```sh
+[bundle exec] fastlane capture_screenshots_android
+```
+
+
+
+----
+
+
 ## Android
 
 ### android set_build_code_internal

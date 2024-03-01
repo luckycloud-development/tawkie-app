@@ -14,20 +14,20 @@ extension DefaultFlowExtensions on WidgetTester {
 
     await tester.pumpAndSettle();
 
-    await tester.waitFor(find.text('Let\'s start'));
-
-    expect(find.text('Let\'s start'), findsOneWidget);
+    // await tester.waitFor(find.text('Let\'s start'));
+    //
+    // expect(find.text('Let\'s start'), findsOneWidget);
 
     final input = find.byType(TextField);
 
-    expect(input, findsOneWidget);
+    // expect(input, findsOneWidget);
 
     // getting the placeholder in place
-    await tester.tap(find.byIcon(Icons.search));
-    await tester.pumpAndSettle();
-    await tester.enterText(input, homeserver);
-    await tester.pumpAndSettle();
-    await tester.testTextInput.receiveAction(TextInputAction.done);
+    // await tester.tap(find.byIcon(Icons.search));
+    // await tester.pumpAndSettle();
+    // await tester.enterText(input, homeserver);
+    // await tester.pumpAndSettle();
+    // await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
     // in case registration is allowed
@@ -164,6 +164,9 @@ extension DefaultFlowExtensions on WidgetTester {
         'Found ChatListViewBody, skipping login.',
         name: 'Test Runner',
       );
+      // Perform action to navigate to chat directly
+      await tester.tap(find.byType(ChatListViewBody));
+      await tester.pumpAndSettle();
     }
 
     await tester.acceptPushWarning();

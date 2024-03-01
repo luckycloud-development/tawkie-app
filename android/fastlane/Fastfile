@@ -18,6 +18,22 @@ update_fastlane
 
 default_platform(:android)
 
+def capture_screenshots_on_devices(devices, languages, output_path)
+  devices.each do |device|
+    languages.each do |language|
+      sh "flutter drive --target=test_driver/app.dart --driver=test_driver/app_test.dart --flavor=dev --device-id=#{device} --dart-define=locale=#{language} --screenshots=#{output_path}/#{device}/#{language}"
+    end
+  end
+end
+
+lane :capture_screenshots_android do
+  capture_screenshots_on_devices(
+    ["Google_Pixel_5", "Galaxy_Nexus"], # Device list
+    ["en", "fr", "de", "es", "it", "pt", "nl"], # Languages for screenshots
+    "./fastlane/screenshots" # Output path for screenshots
+  )
+end
+
 platform :android do
   lane :set_build_code_internal do
     versions = google_play_track_version_codes(
