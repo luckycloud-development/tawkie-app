@@ -40,8 +40,9 @@ class HomeserverPickerController extends State<HomeserverPicker> {
     text: AppConfig.defaultHomeserver,
   );
 
-  String selectedServer =
-      AppConfig.defaultHomeserver; // Initialized with default server
+  String selectedServer = !kDebugMode
+      ? AppConfig.defaultHomeserver
+      : 'localhost:80'; // Initialized with default server
 
   String? error;
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'homeserver_picker.dart';
 
@@ -12,6 +13,7 @@ class HomeserverAppBar extends StatelessWidget {
     final List<String> serversTawkie = [
       'alpha.tawkie.fr',
       'loveto.party',
+      if (kDebugMode) 'localhost:80',
     ];
 
     return Row(
