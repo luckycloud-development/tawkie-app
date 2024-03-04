@@ -217,6 +217,7 @@ class BotBridgeConnection {
       // Check if the social network is Discord
       if (socialNetwork.name == "Discord" && latestMessages.length >= 2) {
         // If this is the case and there are at least two messages, take the penultimate one
+
         latestMessage = latestMessages.last;
       } else if (latestMessages.isNotEmpty) {
         // Otherwise, just continue to take the last message as usual.
@@ -387,13 +388,11 @@ class BotBridgeConnection {
           final String latestMessageToString =
               latestMessage.content['body'].toString();
 
-          print('Le dernier message est: $latestMessageToString');
           // to find out if we're connected
           if (!successMatch.hasMatch(latestMessageToString) &&
               !alreadyLogoutMatch.hasMatch(latestMessageToString)) {
             Logs().v("You're always connected to ${network.name}");
             result = 'Connected';
-            break;
           } else if (successMatch.hasMatch(latestMessageToString) ||
               alreadyLogoutMatch.hasMatch(latestMessageToString)) {
             Logs().v("You're disconnected to ${network.name}");
@@ -866,9 +865,18 @@ class BotBridgeConnection {
   }
 
   // Function to delete a conversation with a bot
-  Future<void> deleteConversation(BuildContext context, String chatBot,
+  Future<void> deleteConversation(BuildContext context, SocialNetwork network,
       ConnectionStateModel connectionState) async {
-    final String botUserId = "$chatBot$hostname";
+    String botUserId;
+
+    switch(network.name){
+      case'Discord':
+        botUserId = network.chatBot;
+        break;
+        default:
+          botUserId = "${network.chatBot}$hostname";
+          break;
+    }
     Future.microtask(() {
       connectionState.updateConnectionTitle(
         L10n.of(context)!.loading_deleteRoom,

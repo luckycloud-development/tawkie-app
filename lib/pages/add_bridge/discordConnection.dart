@@ -12,8 +12,7 @@ class DiscordConnection extends StatelessWidget {
   final SocialNetwork network;
 
   const DiscordConnection(
-      {Key? key, required this.botConnection, required this.network})
-      : super(key: key);
+      {super.key, required this.botConnection, required this.network});
 
   @override
   Widget build(BuildContext context) {
