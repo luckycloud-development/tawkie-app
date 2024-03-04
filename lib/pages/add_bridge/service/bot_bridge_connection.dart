@@ -869,13 +869,13 @@ class BotBridgeConnection {
       ConnectionStateModel connectionState) async {
     String botUserId;
 
-    switch(network.name){
-      case'Discord':
+    switch (network.name) {
+      case 'Discord':
         botUserId = network.chatBot;
         break;
-        default:
-          botUserId = "${network.chatBot}$hostname";
-          break;
+      default:
+        botUserId = "${network.chatBot}$hostname";
+        break;
     }
     Future.microtask(() {
       connectionState.updateConnectionTitle(

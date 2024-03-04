@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:go_router/go_router.dart';
-import 'package:matrix/matrix.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:tawkie/pages/add_bridge/model/social_network.dart';
 import 'package:tawkie/pages/add_bridge/service/bot_bridge_connection.dart';
@@ -315,10 +313,9 @@ class ResponseQRFutureBuilder extends StatelessWidget {
                     .firstWhere((element) => element.name == network.name)
                     .connected = true;
 
-                context.pop();
-                if (context.canPop()) {
-                  context.pop();
-                }
+                Navigator.of(context).pop();
+                // Goes back twice (closes current and previous pages)
+                Navigator.pop(context, true);
               },
               child: Text(
                 L10n.of(context)!.ok,
@@ -345,10 +342,8 @@ class ResponseQRFutureBuilder extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                context.pop();
-                if (context.canPop()) {
-                  context.pop();
-                }
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
               child: Text(
                 L10n.of(context)!.ok,
