@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:tawkie/pages/add_bridge/delete_conversation_dialog.dart';
+import 'package:tawkie/pages/add_bridge/qr_code_connect.dart';
 import 'package:tawkie/pages/add_bridge/service/bot_bridge_connection.dart';
 import 'package:tawkie/pages/add_bridge/service/hostname.dart';
 import 'package:tawkie/pages/add_bridge/show_bottom_sheet.dart';
@@ -11,6 +13,7 @@ import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/utils/platform_size.dart';
 import 'package:tawkie/widgets/matrix.dart';
 
+import '../../widgets/future_loading_dialog_custom.dart';
 import 'add_bridge_header.dart';
 import 'connection_bridge_dialog.dart';
 import 'discordConnection.dart';
@@ -223,16 +226,44 @@ class _AddBridgeBodyState extends State<AddBridgeBody> {
             // Trying to connect to Discord
 
             if (!PlatformInfos.isMobile) {
-              // Redirect to LinkedinConnectionExplain page
-              success = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DiscordConnection(
-                    botConnection: botConnection,
-                    network: network,
-                  ),
-                ),
-              );
+              // Trying to connect to discord
+              try {
+                DiscordResult?
+                    result; // Variable to store the result of the connection
+
+                // To show Loading while executing the function
+                await showCustomLoadingDialog(
+                  context: context,
+                  future: () async {
+                    result = await botConnection.createBridgeDiscordQRCode(
+                        context, network);
+                  },
+                );
+
+                if (result?.result ==
+                    "Error logging in: websocket: close sent") {
+                  // Display a showDialog with an error message related to the password
+                  showCatchErrorDialog(context, L10n.of(context)!.err_timeOut);
+                } else {
+                  // ShowDialog for code and QR Code login
+                  final bool success = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRCodeConnectPage(
+                            qrCode: result!.qrCode!,
+                            code: result!.urlLink!,
+                            botConnection: botConnection,
+                            socialNetwork: network,
+                          ),
+                        ),
+                      ) ??
+                      false;
+                }
+              } catch (e) {
+                Navigator.of(context).pop();
+                //To view other catch-related errors
+                showCatchErrorDialog(context, e);
+              }
             } else {
               // Navigate to WebViewConnection and provide callback function
               Navigator.push(

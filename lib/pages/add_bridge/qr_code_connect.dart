@@ -126,6 +126,8 @@ class QRExplanation extends StatelessWidget {
         break;
     }
 
+    print(qrCode);
+
     // Setting up the QR code shape according to SocialNetwork
     switch (network.name) {
       case "Discord":
@@ -314,8 +316,10 @@ class ResponseQRFutureBuilder extends StatelessWidget {
                     .connected = true;
 
                 Navigator.of(context).pop();
-                // Goes back twice (closes current and previous pages)
-                Navigator.pop(context, true);
+                if (network.name != "Discord") {
+                  // Goes back twice (closes current and previous pages)
+                  Navigator.pop(context, true);
+                }
               },
               child: Text(
                 L10n.of(context)!.ok,
@@ -343,7 +347,9 @@ class ResponseQRFutureBuilder extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop();
+                if (network.name != "Discord") {
+                  Navigator.of(context).pop();
+                }
               },
               child: Text(
                 L10n.of(context)!.ok,
