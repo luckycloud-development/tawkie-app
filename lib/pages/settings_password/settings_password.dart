@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:one_of/one_of.dart';
 import 'package:ory_kratos_client/ory_kratos_client.dart';
 import 'package:tawkie/config/app_config.dart';
 
@@ -80,8 +82,25 @@ class SettingsPasswordController extends State<SettingsPassword> {
     });
     try {
       final scaffoldMessenger = ScaffoldMessenger.of(context);
-      final response = await api.createNativeSettingsFlow();
+      final settingsFlowResponse = await api.createNativeSettingsFlow();
 
+      final updateSettingsFlow =
+          UpdateSettingsFlowWithPasswordMethod((builder) => builder
+            ..method = 'password'
+            ..password = newPassword1Controller.text);
+
+      // Create an UpdateLoginFlowBodyBuilder object and assign it the UpdateLoginFlowWithPasswordMethod object
+      final updateSettingsFlowBody = UpdateSettingsFlowBody(
+        (builder) =>
+            builder..oneOf = OneOf.fromValue1(value: updateSettingsFlow),
+      );
+
+      final passwordResponse = await api.updateSettingsFlow(
+          flow: settingsFlowResponse.data!.id,
+          updateSettingsFlowBody: updateSettingsFlowBody);
+      if (kDebugMode) {
+        print('Successfully settingsFlowResponse with new password');
+      }
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(L10n.of(context)!.passwordHasBeenChanged),
@@ -90,6 +109,7 @@ class SettingsPasswordController extends State<SettingsPassword> {
       if (mounted) context.pop();
     } on DioException catch (e) {
       // Handle DioError specifically
+
       setState(() {
         newPassword2Error = e.toLocalizedString(
           context,
