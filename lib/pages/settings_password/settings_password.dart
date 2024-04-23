@@ -11,7 +11,6 @@ import 'package:tawkie/config/app_config.dart';
 
 import 'package:tawkie/pages/settings_password/settings_password_view.dart';
 import 'package:tawkie/utils/localized_exception_extension.dart';
-import 'package:tawkie/widgets/matrix.dart';
 
 class SettingsPassword extends StatefulWidget {
   const SettingsPassword({super.key});
