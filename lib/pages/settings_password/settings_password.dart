@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ory_kratos_client/ory_kratos_client.dart';
+import 'package:tawkie/config/app_config.dart';
 
 import 'package:tawkie/pages/settings_password/settings_password_view.dart';
 import 'package:tawkie/utils/localized_exception_extension.dart';
@@ -25,7 +29,29 @@ class SettingsPasswordController extends State<SettingsPassword> {
 
   bool loading = false;
 
+  String baseUrl = AppConfig.baseUrl;
+  late final Dio dio;
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    dio = Dio(BaseOptions(baseUrl: '${baseUrl}panel/api/.ory'));
+
+    // Set authorization header with session token
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final sessionToken = await _secureStorage.read(key: 'sessionToken');
+        options.headers['Authorization'] = 'Bearer $sessionToken';
+        return handler.next(options);
+      },
+    ));
+  }
+
   void changePassword() async {
+    final OryKratosClient kratosClient = OryKratosClient(dio: dio);
+    final api = kratosClient.getFrontendApi();
+
     setState(() {
       oldPasswordError = newPassword1Error = newPassword2Error = null;
     });
@@ -54,17 +80,16 @@ class SettingsPasswordController extends State<SettingsPassword> {
     });
     try {
       final scaffoldMessenger = ScaffoldMessenger.of(context);
-      await Matrix.of(context).client.changePassword(
-            newPassword1Controller.text,
-            oldPassword: oldPasswordController.text,
-          );
+      final response = await api.createNativeSettingsFlow();
+
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(L10n.of(context)!.passwordHasBeenChanged),
         ),
       );
       if (mounted) context.pop();
-    } catch (e) {
+    } on DioException catch (e) {
+      // Handle DioError specifically
       setState(() {
         newPassword2Error = e.toLocalizedString(
           context,
