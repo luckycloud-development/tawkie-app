@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tawkie/config/themes.dart';
 
 class LoginDialog extends StatelessWidget {
   final VoidCallback onLoginPressed;
@@ -7,9 +6,6 @@ class LoginDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textFieldFillColor = FluffyThemes.isColumnMode(context)
-        ? Theme.of(context).colorScheme.background
-        : Theme.of(context).colorScheme.surfaceVariant;
 
     return AlertDialog(
       title: Text('Login Required'),
