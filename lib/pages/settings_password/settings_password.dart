@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_of/one_of.dart';
 import 'package:ory_kratos_client/ory_kratos_client.dart';
@@ -11,6 +12,8 @@ import 'package:tawkie/config/app_config.dart';
 
 import 'package:tawkie/pages/settings_password/settings_password_view.dart';
 import 'package:tawkie/utils/localized_exception_extension.dart';
+import 'package:tawkie/widgets/login_dialog.dart';
+import 'package:tawkie/widgets/matrix.dart';
 
 class SettingsPassword extends StatefulWidget {
   const SettingsPassword({super.key});
@@ -20,11 +23,9 @@ class SettingsPassword extends StatefulWidget {
 }
 
 class SettingsPasswordController extends State<SettingsPassword> {
-  final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPassword1Controller = TextEditingController();
   final TextEditingController newPassword2Controller = TextEditingController();
 
-  String? oldPasswordError;
   String? newPassword1Error;
   String? newPassword2Error;
 
@@ -33,6 +34,19 @@ class SettingsPasswordController extends State<SettingsPassword> {
   String baseUrl = AppConfig.baseUrl;
   late final Dio dio;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  void reLoginAction() async {
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+    //Delete access ory token
+    await secureStorage.delete(key: 'sessionToken');
+    final matrix = Matrix.of(context);
+    await showFutureLoadingDialog(
+      context: context,
+      future: () => matrix.client.logout(),
+    );
+    context.go('/home/login');
+  }
 
   @override
   void initState() {
@@ -54,14 +68,8 @@ class SettingsPasswordController extends State<SettingsPassword> {
     final api = kratosClient.getFrontendApi();
 
     setState(() {
-      oldPasswordError = newPassword1Error = newPassword2Error = null;
+      newPassword1Error = newPassword2Error = null;
     });
-    if (oldPasswordController.text.isEmpty) {
-      setState(() {
-        oldPasswordError = L10n.of(context)!.pleaseEnterYourPassword;
-      });
-      return;
-    }
     if (newPassword1Controller.text.isEmpty ||
         newPassword1Controller.text.length < 6) {
       setState(() {
@@ -108,7 +116,19 @@ class SettingsPasswordController extends State<SettingsPassword> {
       if (mounted) context.pop();
     } on DioException catch (e) {
       // Handle DioError specifically
-
+      if (kDebugMode) {
+        print(e.response?.data);
+      }
+      if (e.response?.statusCode == 403 || e.response?.statusCode == 401) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return LoginDialog(
+              onLoginPressed: reLoginAction,
+            );
+          },
+        );
+      }
       setState(() {
         newPassword2Error = e.toLocalizedString(
           context,
@@ -120,6 +140,13 @@ class SettingsPasswordController extends State<SettingsPassword> {
         loading = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    newPassword1Controller.dispose();
+    newPassword2Controller.dispose();
+    super.dispose();
   }
 
   @override
