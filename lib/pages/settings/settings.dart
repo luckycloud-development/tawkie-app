@@ -6,6 +6,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
@@ -61,6 +62,7 @@ class SettingsController extends State<Settings> {
 
   void logoutAction() async {
     final noBackup = showChatBackupBanner == true;
+    const FlutterSecureStorage secureStorage = FlutterSecureStorage();
     if (await showOkCancelAlertDialog(
           useRootNavigator: false,
           context: context,
@@ -73,6 +75,10 @@ class SettingsController extends State<Settings> {
         OkCancelResult.cancel) {
       return;
     }
+
+    //Delete access ory token
+    await secureStorage.delete(key: 'sessionToken');
+
     final matrix = Matrix.of(context);
     await showFutureLoadingDialog(
       context: context,
