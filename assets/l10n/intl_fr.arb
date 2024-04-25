@@ -2517,5 +2517,7 @@
     "subNotSubArgOne": "Toutes tes messageries favorites rassemblées",
     "subNotSubArgTwo": "Vocaux, photos, videos, post/reel",
     "subNotSubArgThree": "Chiffrement des messages",
-    "subNotSubArgFour": "Remettre en non-lu"
+    "subNotSubArgFour": "Remettre en non-lu",
+    "loginReq": "reconnexion nécessaire",
+    "loginReLogForPassword": "Vous devez vous connecter à nouveau pour modifier votre mot de passe."
 }

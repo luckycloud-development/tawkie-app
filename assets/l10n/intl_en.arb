@@ -2596,5 +2596,7 @@
     "subNotSubArgOne": "All your favorite messengers together",
     "subNotSubArgTwo": "Voice, photo, video, post/reel",
     "subNotSubArgThree": "Message encryption",
-    "subNotSubArgFour": "Put back in non-lu"
+    "subNotSubArgFour": "Put back in non-lu",
+    "loginReLog": "Reconnection required",
+    "loginReLogForPassword": "You need to log in again to change your password."
 }
