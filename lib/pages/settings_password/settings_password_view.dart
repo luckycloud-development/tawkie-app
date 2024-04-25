@@ -27,18 +27,6 @@ class SettingsPasswordView extends StatelessWidget {
                     size: 80,
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller.oldPasswordController,
-                  obscureText: true,
-                  autocorrect: false,
-                  autofocus: true,
-                  readOnly: controller.loading,
-                  decoration: InputDecoration(
-                    hintText: L10n.of(context)!.pleaseEnterYourCurrentPassword,
-                    errorText: controller.oldPasswordError,
-                  ),
-                ),
                 const Divider(height: 32),
                 TextField(
                   controller: controller.newPassword1Controller,
