@@ -63,6 +63,11 @@ class SettingsPasswordController extends State<SettingsPassword> {
     ));
   }
 
+  // Checks password length
+  bool _validatePasswordLength(String password) {
+    return password.length > 8 && password.length <= 64;
+  }
+
   void changePassword() async {
     final OryKratosClient kratosClient = OryKratosClient(dio: dio);
     final api = kratosClient.getFrontendApi();
@@ -70,8 +75,7 @@ class SettingsPasswordController extends State<SettingsPassword> {
     setState(() {
       newPassword1Error = newPassword2Error = null;
     });
-    if (newPassword1Controller.text.isEmpty ||
-        newPassword1Controller.text.length < 6) {
+    if (!_validatePasswordLength(newPassword1Controller.text)) {
       setState(() {
         newPassword1Error = L10n.of(context)!.pleaseChooseAStrongPassword;
       });
