@@ -2509,5 +2509,7 @@
     "sub_not_sub_arg_one": "Toutes tes messageries favorites rassemblées",
     "sub_not_sub_arg_two": "Vocaux, photos, videos, post/reel",
     "sub_not_sub_arg_three": "Chiffrement des messages",
-    "sub_not_sub_arg_four": "Remettre en non-lu"
+    "sub_not_sub_arg_four": "Remettre en non-lu",
+    "loginReq": "reconnexion nécessaire",
+    "loginReLogForPassword": "Vous devez vous connecter à nouveau pour modifier votre mot de passe."
 }

@@ -2589,5 +2589,8 @@
   "sub_not_sub_arg_two": "Voice, photo, video, post/reel",
   "sub_not_sub_arg_three": "Message encryption",
   "sub_not_sub_arg_four": "Put back in non-lu",
-  "errorConnectionText": "Please check your Internet connection and try again."
+  "errorConnectionText": "Please check your Internet connection and try again.",
+  "loginReLog": "Reconnection required",
+  "loginReLogForPassword": "You need to log in again to change your password."
+
 }

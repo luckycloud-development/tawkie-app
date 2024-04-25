@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 class LoginDialog extends StatelessWidget {
   final VoidCallback onLoginPressed;
@@ -6,24 +7,22 @@ class LoginDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return AlertDialog(
-      title: Text('Login Required'),
-      content: Text(
-          "Une authentification est nécessaire avant de pouvoir changer de mot de passe."),
+      title: Text(L10n.of(context)!.loginReLog),
+      content: Text(L10n.of(context)!.loginReLogForPassword),
       actions: <Widget>[
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(); // Close the dialog
           },
-          child: Text('Cancel'),
+          child: Text(L10n.of(context)!.cancel),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             onLoginPressed();
           },
-          child: Text('Login'),
+          child: Text(L10n.of(context)!.login),
         ),
       ],
     );
