@@ -2682,5 +2682,17 @@
   "privacyTextPrivacy": "privacy policy",
   "privacyTextAnd": " and ",
   "privacyTextTerms": "terms of service",
-  "createGroupLimitationWarning": "Only Tawkie / Matrix users can be added to a group chat."
+  "createGroupLimitationWarning": "Only Tawkie / Matrix users can be added to a group chat.",
+  "discord_connectionTitle": "Connect to Discord",
+  "discord_connectToQrCode": "Login via QR code",
+  "discord_connectUsernamePassword": "Login with your username and password",
+  "discord_qrExplainOne": "On your main phone",
+  "discord_qrExplainTwo": "Go to your Discord application",
+  "discord_qrExplainTree": "In your profile tab, go to the list of settings",
+  "discord_qrExplainFour": "Click on SCAN QR CODE",
+  "discord_qrExplainFive": "You can also click directly on this link to go to the right place in your Discord application",
+  "discord_qrExplainSix": "We advise you to open this QR code on a computer and scan it with your cell phone.",
+  "discord_qrExplainSeven": "WARNING",
+  "discord_qrExplainEight": "This QR code expires quickly.",
+  "discord_qrExplainNine": "Scan this QR Code"
 }
