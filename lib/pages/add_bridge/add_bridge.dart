@@ -204,8 +204,7 @@ class BotController extends State<AddBridge> {
     return shouldReconnect;
   }
 
-  Future<void> _processPingResponse(SocialNetwork socialNetwork,
-      String directChat, Room roomBot, RegExpPingPatterns patterns) async {
+  Future<void> _processPingResponse(SocialNetwork socialNetwork, String directChat, Room roomBot, RegExpPingPatterns patterns) async {
     const int maxIterations = 5;
     int currentIteration = 0;
 
@@ -221,8 +220,7 @@ class BotController extends State<AddBridge> {
           return;
         }
 
-        if (_isNotLogged(patterns.notLoggedMatch, latestMessage,
-            patterns.notLoggedAnymoreMatch)) {
+        if (_isNotLogged(patterns.notLoggedMatch, latestMessage, patterns.notLoggedAnymoreMatch)) {
           Logs().v('Not connected to ${socialNetwork.name}');
           _updateNetworkStatus(socialNetwork, false, false);
           return;
@@ -241,8 +239,7 @@ class BotController extends State<AddBridge> {
     }
 
     if (currentIteration == maxIterations) {
-      Logs().v(
-          "Maximum iterations reached, setting result to 'error to ${socialNetwork.name}'");
+      Logs().v("Maximum iterations reached, setting result to 'error to ${socialNetwork.name}'");
       _handleError(socialNetwork);
     } else if (!continueProcess) {
       Logs().v(('ping stopping'));
@@ -273,6 +270,11 @@ class BotController extends State<AddBridge> {
         return RegExpPingPatterns(
           PingPatterns.linkedinOnlineMatch,
           PingPatterns.linkedinNotLoggedMatch,
+        );
+      case "Discord":
+        return RegExpPingPatterns(
+          PingPatterns.discordOnlineMatch,
+          PingPatterns.discordNotLoggedMatch,
         );
       default:
         throw Exception("Unsupported social network: $networkName");
@@ -950,6 +952,73 @@ class BotController extends State<AddBridge> {
     Future.microtask(() {
       connectionState.reset();
     });
+  }
+
+  // Discord
+  // Function for create and login bridge with QR Code Discord
+  Future<DiscordResult> createBridgeDiscordQRCode(
+      BuildContext context, SocialNetwork network) async {
+    // Element corresponding to the Discord social network
+    final String botUserId = network.chatBot;
+
+    // Success phrases to spot
+    final RegExp successMatch = LoginRegex.discordSuccessMatch;
+    final RegExp alreadySuccessMatch = LoginRegex.discordAlreadySuccessMatch;
+
+    // Error phrase to spot
+    final RegExp timeOutMatch = LoginRegex.discordTimeoutMatch;
+
+    // Add a direct chat with the bot (if you haven't already)
+    String? directChat = client.getDirectChatFromUserId(botUserId);
+    directChat ??= await client.startDirectChat(botUserId);
+
+    final Room? roomBot = client.getRoomById(directChat);
+
+    // Send the "login" message to the bot
+    await roomBot?.sendTextEvent("login-qr");
+    await Future.delayed(const Duration(seconds: 3)); // Wait sec
+
+    DiscordResult result; // Variable to track the result of the QR Code
+
+    // Get the latest messages from the room (limited to the specified number)
+    while (true) {
+      final GetRoomEventsResponse response = await client.getRoomEvents(
+        directChat,
+        Direction.b, // To get the latest messages
+        limit: 2, // Number of messages to obtain
+      );
+
+      final List<MatrixEvent> latestMessages = response.chunk;
+
+      final String latestMessageBody =
+      latestMessages.first.content['body'].toString();
+
+      final String urlQRCode = latestMessages.first.content['url'].toString();
+
+      if (latestMessages.isNotEmpty) {
+        if (successMatch.hasMatch(latestMessageBody) ||
+            alreadySuccessMatch.hasMatch(latestMessageBody)) {
+          Logs().v("You're already logged to Discord");
+
+          result = DiscordResult("Connected", "", "");
+
+          break; // Exit the loop once the "login" message has been sent and is success
+        } else if (timeOutMatch.hasMatch(latestMessageBody)) {
+          Logs().v("Login timed out");
+
+          result = DiscordResult("Time out", "", "");
+
+          break;
+        } else {
+          Logs().v("scanTheCode");
+
+          result = DiscordResult("scanTheCode", latestMessageBody, urlQRCode);
+
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   @override
