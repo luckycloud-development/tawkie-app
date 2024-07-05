@@ -139,6 +139,25 @@ class _WebViewConnectionState extends State<WebViewConnection> {
             })();
           """);
 
+          // Inject JavaScript for specific zoom behavior for Facebook and Discord
+          if (widget.network.name == "Facebook Messenger") {
+            await controller.evaluateJavascript(source: """
+              (function() {
+                document.body.style.zoom = "1.5";
+                window.scrollTo(0, 0);
+              })();
+            """);
+          }
+
+          if (widget.network.name == "Discord") {
+            await controller.evaluateJavascript(source: """
+              (function() {
+                document.body.style.zoom = "1.2";
+                window.scrollTo(0, 0);
+              })();
+            """);
+          }
+
           // Check the URL when the page finishes loading
           switch (widget.network.name) {
             case "Facebook Messenger":
