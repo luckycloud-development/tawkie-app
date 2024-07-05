@@ -46,6 +46,7 @@ class _WebViewConnectionState extends State<WebViewConnection> {
 
   Future<void> _clearCookies() async {
     await cookieManager.clearCookies();
+
   }
 
   @override
@@ -178,26 +179,6 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                 );
               }
               break;
-            case "Discord":
-              print("La vraie url: ${url.toString()}");
-              if (!_discordBridgeCreated &&
-                  url != null &&
-                  url.toString().contains(widget.network.urlRedirect!)) {
-                // Close the WebView
-                await _closeWebView();
-                await showCustomLoadingDialog(
-                  context: context,
-                  future: () async {
-                    // Mark the Discord bridge as created
-                    _discordBridgeCreated = true;
-
-                    await widget.controller.createBridgeDiscord(context,
-                        cookieManager, connectionState, widget.network);
-                  },
-                );
-              }
-              break;
-            // Other network
           }
 
           if (widget.network.connected == true && !_isDisposed) {
@@ -206,6 +187,36 @@ class _WebViewConnectionState extends State<WebViewConnection> {
 
             // Close the current page
             Navigator.pop(context);
+          }
+        },
+        onReceivedHttpError: (InAppWebViewController controller,
+            WebResourceRequest request, WebResourceResponse response) async {
+          switch (widget.network.name) {
+            case "Discord":
+              String? authorizationHeaderValue = widget.controller
+                  .extractAuthorizationHeader(request.headers!);
+
+              if (authorizationHeaderValue != null) {
+                if (!_discordBridgeCreated) {
+                  // Close the WebView
+                  await _closeWebView();
+                }
+                await showCustomLoadingDialog(
+                  context: context,
+                  future: () async {
+                    await widget.controller.createBridgeDiscord(
+                        context,
+                        cookieManager,
+                        connectionState,
+                        widget.network,
+                        authorizationHeaderValue);
+                  },
+                );
+                // Close the current page
+                Navigator.pop(context);
+              }
+              break;
+            // Other network
           }
         },
       ),

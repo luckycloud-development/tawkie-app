@@ -86,7 +86,7 @@ class SocialNetworkManager {
         name: "Discord",
         chatBot: "@discordbot:",
         urlLogin: "https://discord.com/login",
-        urlRedirect: "https://discord.com/api/v9/science",
+        urlRedirect: "https://discord.com/channels/@me",
     ),
   ];
 }
