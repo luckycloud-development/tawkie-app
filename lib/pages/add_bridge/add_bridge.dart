@@ -207,7 +207,8 @@ class BotController extends State<AddBridge> {
     return shouldReconnect;
   }
 
-  Future<void> _processPingResponse(SocialNetwork socialNetwork, String directChat, Room roomBot, RegExpPingPatterns patterns) async {
+  Future<void> _processPingResponse(SocialNetwork socialNetwork,
+      String directChat, Room roomBot, RegExpPingPatterns patterns) async {
     const int maxIterations = 5;
     int currentIteration = 0;
 
@@ -223,7 +224,8 @@ class BotController extends State<AddBridge> {
           return;
         }
 
-        if (_isNotLogged(patterns.notLoggedMatch, latestMessage, patterns.notLoggedAnymoreMatch)) {
+        if (_isNotLogged(patterns.notLoggedMatch, latestMessage,
+            patterns.notLoggedAnymoreMatch)) {
           Logs().v('Not connected to ${socialNetwork.name}');
           _updateNetworkStatus(socialNetwork, false, false);
           return;
@@ -242,7 +244,8 @@ class BotController extends State<AddBridge> {
     }
 
     if (currentIteration == maxIterations) {
-      Logs().v("Maximum iterations reached, setting result to 'error to ${socialNetwork.name}'");
+      Logs().v(
+          "Maximum iterations reached, setting result to 'error to ${socialNetwork.name}'");
       _handleError(socialNetwork);
     } else if (!continueProcess) {
       Logs().v(('ping stopping'));
@@ -538,25 +541,23 @@ class BotController extends State<AddBridge> {
         );
         break;
       case "Discord":
-      // Trying to connect to Discord
+        // Trying to connect to Discord
 
         if (!PlatformInfos.isMobile) {
           // Trying to connect to discord
           try {
             DiscordResult?
-            result; // Variable to store the result of the connection
+                result; // Variable to store the result of the connection
 
             // To show Loading while executing the function
             await showCustomLoadingDialog(
               context: context,
               future: () async {
-                result = await createBridgeDiscordQRCode(
-                    context, network);
+                result = await createBridgeDiscordQRCode(context, network);
               },
             );
 
-            if (result?.result ==
-                "Error logging in: websocket: close sent") {
+            if (result?.result == "Error logging in: websocket: close sent") {
               // Display a showDialog with an error message related to the password
               showCatchErrorDialog(context, L10n.of(context)!.errTimeOut);
             } else {
@@ -1060,7 +1061,7 @@ class BotController extends State<AddBridge> {
       final List<MatrixEvent> latestMessages = response.chunk;
 
       final String latestMessageBody =
-      latestMessages.first.content['body'].toString();
+          latestMessages.first.content['body'].toString();
 
       final String urlQRCode = latestMessages.first.content['url'].toString();
 
