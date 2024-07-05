@@ -34,6 +34,8 @@ class _WebViewConnectionState extends State<WebViewConnection> {
       false; // Variable to track if the Instagram bridge has been created
   bool _linkedinBridgeCreated =
       false; // Variable to track if the Linkedin bridge has been created
+  bool _discordBridgeCreated =
+      false; // Variable to track if the Discord bridge has been created
 
   @override
   void initState() {
@@ -64,13 +66,20 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     final connectionState =
         Provider.of<ConnectionStateModel>(context, listen: false);
 
-    InAppWebViewSettings settings = InAppWebViewSettings();
-    if (widget.network.name == "Facebook Messenger") {
-      settings = InAppWebViewSettings(
-        userAgent:
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-      );
-    }
+    InAppWebViewSettings settings = InAppWebViewSettings(
+      userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      useWideViewPort: true,
+      loadWithOverviewMode: true,
+      supportZoom: true,
+      builtInZoomControls: true,
+      displayZoomControls: false,
+      initialScale: 0,
+      javaScriptEnabled: true,
+      mediaPlaybackRequiresUserGesture: false,
+      domStorageEnabled: true,
+      databaseEnabled: true,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -89,6 +98,17 @@ class _WebViewConnectionState extends State<WebViewConnection> {
           _webViewController = controller;
         },
         onLoadStop: (InAppWebViewController controller, Uri? url) async {
+          // Inject JavaScript to force desktop view for Facebook and Discord
+          if (widget.network.name == "Facebook Messenger" ||
+              widget.network.name == "Discord") {
+            await controller.evaluateJavascript(source: """
+              var meta = document.createElement('meta');
+              meta.name = 'viewport';
+              meta.content = 'width=1024';
+              document.getElementsByTagName('head')[0].appendChild(meta);
+            """);
+          }
+
           // Check the URL when the page finishes loading
           switch (widget.network.name) {
             case "Facebook Messenger":
@@ -145,6 +165,24 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                     _linkedinBridgeCreated = true;
 
                     await widget.controller.createBridgeLinkedin(context,
+                        cookieManager, connectionState, widget.network);
+                  },
+                );
+              }
+              break;
+            case "Discord":
+              if (!_discordBridgeCreated &&
+                  url != null &&
+                  url.toString().contains(widget.network.urlRedirect!)) {
+                // Close the WebView
+                await _closeWebView();
+                await showCustomLoadingDialog(
+                  context: context,
+                  future: () async {
+                    // Mark the Discord bridge as created
+                    _discordBridgeCreated = true;
+
+                    await widget.controller.createBridgeDiscord(context,
                         cookieManager, connectionState, widget.network);
                   },
                 );
