@@ -61,6 +61,7 @@ class LoginRegex {
 
   // Discord
   static final RegExp discordSuccessMatch = RegExp(r'Connecting to Discord');
+  static final RegExp discordOtherSuccessMatch = RegExp(r"Successfully logged in");
   static final RegExp discordAlreadySuccessMatch =
       RegExp(r"You're already logged in");
   static final RegExp discordTimeoutMatch =

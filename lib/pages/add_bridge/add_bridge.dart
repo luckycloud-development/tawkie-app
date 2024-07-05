@@ -1123,6 +1123,7 @@ class BotController extends State<AddBridge> {
 
     // Success phrases to spot
     final RegExp successMatch = LoginRegex.discordSuccessMatch;
+    final RegExp othersSuccessMatch = LoginRegex.discordOtherSuccessMatch;
     final RegExp alreadySuccessMatch = LoginRegex.discordAlreadySuccessMatch;
 
     // Add a direct chat with the Discord bot (if you haven't already)
@@ -1158,13 +1159,14 @@ class BotController extends State<AddBridge> {
 
       final List<MatrixEvent> latestMessages = response.chunk ?? [];
       latestMessage = latestMessages.last.content['body'].toString() ?? '';
-      final String? sender = latestMessages.last.senderId;
+      final String sender = latestMessages.last.senderId;
 
       if (kDebugMode) {
         print("latestMessage $latestMessage");
       }
       if (sender == botUserId) {
         if (successMatch.hasMatch(latestMessage) ||
+            othersSuccessMatch.hasMatch(latestMessage) ||
             alreadySuccessMatch.hasMatch(latestMessage)) {
           Logs().v("You're logged to Discord");
 
