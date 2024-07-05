@@ -66,4 +66,3 @@ const String clearCookiesAndStorage = """
     sessionStorage.clear();
   })();
 """;
-

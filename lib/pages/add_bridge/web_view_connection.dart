@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:tawkie/pages/add_bridge/add_bridge.dart';
+import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/utils/webview_scripts.dart';
 import 'package:tawkie/widgets/future_loading_dialog_custom.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
@@ -48,7 +49,12 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     await cookieManager.clearCookies();
     if (_webViewController != null) {
       await _webViewController!
-          .evaluateJavascript(source: clearCookiesAndStorage);
+          .evaluateJavascript(source: clearCookiesAndStorage)
+          .then((result) {
+        // Handle the result if necessary
+      }).catchError((error) {
+        // Handle the error if necessary
+      });
     }
   }
 
@@ -107,19 +113,43 @@ class _WebViewConnectionState extends State<WebViewConnection> {
           // Inject JavaScript to force desktop view for Facebook and Discord
           if (widget.network.name == "Facebook Messenger" ||
               widget.network.name == "Discord") {
-            await controller.evaluateJavascript(source: forceDesktopView);
+            await controller
+                .evaluateJavascript(source: forceDesktopView)
+                .then((result) {
+              // Handle the result if necessary
+            }).catchError((error) {
+              // Handle the error if necessary
+            });
           }
 
           // Inject JavaScript to accept cookies automatically and not get the message when the page opens
-          await controller.evaluateJavascript(source: acceptCookies);
+          await controller
+              .evaluateJavascript(source: acceptCookies)
+              .then((result) {
+            // Handle the result if necessary
+          }).catchError((error) {
+            // Handle the error if necessary
+          });
 
           // Inject JavaScript for specific zoom behavior for Facebook and Discord
           if (widget.network.name == "Facebook Messenger") {
-            await controller.evaluateJavascript(source: zoomFacebook);
+            await controller
+                .evaluateJavascript(source: zoomFacebook)
+                .then((result) {
+              // Handle the result if necessary
+            }).catchError((error) {
+              // Handle the error if necessary
+            });
           }
 
-          if (widget.network.name == "Discord") {
-            await controller.evaluateJavascript(source: zoomDiscord);
+          if (widget.network.name == "Discord" && !PlatformInfos.isIOS) {
+            await controller
+                .evaluateJavascript(source: zoomDiscord)
+                .then((result) {
+              // Handle the result if necessary
+            }).catchError((error) {
+              // Handle the error if necessary
+            });
           }
 
           // Check the URL when the page finishes loading
