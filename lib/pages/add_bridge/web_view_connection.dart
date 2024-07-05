@@ -41,12 +41,15 @@ class _WebViewConnectionState extends State<WebViewConnection> {
   @override
   void initState() {
     super.initState();
-    _clearCookies();
+    _clearCookiesAndData();
   }
 
-  Future<void> _clearCookies() async {
+  Future<void> _clearCookiesAndData() async {
     await cookieManager.clearCookies();
-
+    if (_webViewController != null) {
+      await _webViewController!
+          .evaluateJavascript(source: clearCookiesAndStorage);
+    }
   }
 
   @override
@@ -95,9 +98,10 @@ class _WebViewConnectionState extends State<WebViewConnection> {
         initialUrlRequest: URLRequest(
           url: WebUri(widget.network.urlLogin!),
         ),
-        onWebViewCreated: (InAppWebViewController controller) {
+        onWebViewCreated: (InAppWebViewController controller) async {
           if (_isDisposed) return; // Prevent further operations if disposed
           _webViewController = controller;
+          await _clearCookiesAndData();
         },
         onLoadStop: (InAppWebViewController controller, Uri? url) async {
           // Inject JavaScript to force desktop view for Facebook and Discord
