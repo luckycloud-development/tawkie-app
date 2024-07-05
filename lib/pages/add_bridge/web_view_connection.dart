@@ -109,6 +109,36 @@ class _WebViewConnectionState extends State<WebViewConnection> {
             """);
           }
 
+          // Inject JavaScript to accept cookies automatically and not get the message when the page opens
+          await controller.evaluateJavascript(source: """
+            (function() {
+              function clickAcceptButton() {
+                var acceptButtons = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
+                for (var i = 0; i < acceptButtons.length; i++) {
+                  var button = acceptButtons[i];
+                  if (button.innerText.toLowerCase().includes('accept') ||
+                      button.innerText.toLowerCase().includes('agree') ||
+                      button.innerText.toLowerCase().includes('autoriser tous les cookies') ||
+                      button.innerText.toLowerCase().includes('autoriser') ||
+                      button.innerText.toLowerCase().includes('tous les cookies')) {
+                    button.click();
+                  }
+                }
+              }
+
+              var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                  clickAcceptButton();
+                });
+              });
+
+              observer.observe(document.body, { childList: true, subtree: true });
+
+              // Initial check
+              clickAcceptButton();
+            })();
+          """);
+
           // Check the URL when the page finishes loading
           switch (widget.network.name) {
             case "Facebook Messenger":
