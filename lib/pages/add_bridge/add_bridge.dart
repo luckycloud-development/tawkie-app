@@ -370,6 +370,11 @@ class BotController extends State<AddBridge> {
           'success': LogoutRegex.linkedinSuccessMatch,
           'alreadyLogout': LogoutRegex.linkedinAlreadyLogoutMatch
         };
+      case 'Discord':
+        return {
+          'success': LogoutRegex.discordSuccessMatch,
+          'alreadyLogout': LogoutRegex.discordAlreadyLogoutMatch
+        };
       default:
         throw ArgumentError('Unsupported network: $networkName');
     }
