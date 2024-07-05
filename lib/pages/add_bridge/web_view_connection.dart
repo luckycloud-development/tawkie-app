@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:tawkie/pages/add_bridge/add_bridge.dart';
+import 'package:tawkie/utils/webview_scripts.dart';
 import 'package:tawkie/widgets/future_loading_dialog_custom.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -101,61 +102,19 @@ class _WebViewConnectionState extends State<WebViewConnection> {
           // Inject JavaScript to force desktop view for Facebook and Discord
           if (widget.network.name == "Facebook Messenger" ||
               widget.network.name == "Discord") {
-            await controller.evaluateJavascript(source: """
-              var meta = document.createElement('meta');
-              meta.name = 'viewport';
-              meta.content = 'width=1024';
-              document.getElementsByTagName('head')[0].appendChild(meta);
-            """);
+            await controller.evaluateJavascript(source: forceDesktopView);
           }
 
           // Inject JavaScript to accept cookies automatically and not get the message when the page opens
-          await controller.evaluateJavascript(source: """
-            (function() {
-              function clickAcceptButton() {
-                var acceptButtons = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
-                for (var i = 0; i < acceptButtons.length; i++) {
-                  var button = acceptButtons[i];
-                  if (button.innerText.toLowerCase().includes('accept') ||
-                      button.innerText.toLowerCase().includes('agree') ||
-                      button.innerText.toLowerCase().includes('autoriser tous les cookies') ||
-                      button.innerText.toLowerCase().includes('autoriser') ||
-                      button.innerText.toLowerCase().includes('tous les cookies')) {
-                    button.click();
-                  }
-                }
-              }
-
-              var observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                  clickAcceptButton();
-                });
-              });
-
-              observer.observe(document.body, { childList: true, subtree: true });
-
-              // Initial check
-              clickAcceptButton();
-            })();
-          """);
+          await controller.evaluateJavascript(source: acceptCookies);
 
           // Inject JavaScript for specific zoom behavior for Facebook and Discord
           if (widget.network.name == "Facebook Messenger") {
-            await controller.evaluateJavascript(source: """
-              (function() {
-                document.body.style.zoom = "1.5";
-                window.scrollTo(0, 0);
-              })();
-            """);
+            await controller.evaluateJavascript(source: zoomFacebook);
           }
 
           if (widget.network.name == "Discord") {
-            await controller.evaluateJavascript(source: """
-              (function() {
-                document.body.style.zoom = "1.2";
-                window.scrollTo(0, 0);
-              })();
-            """);
+            await controller.evaluateJavascript(source: zoomDiscord);
           }
 
           // Check the URL when the page finishes loading
@@ -220,6 +179,7 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               }
               break;
             case "Discord":
+              print("La vraie url: ${url.toString()}");
               if (!_discordBridgeCreated &&
                   url != null &&
                   url.toString().contains(widget.network.urlRedirect!)) {
