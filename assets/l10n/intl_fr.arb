@@ -2498,5 +2498,17 @@
     "privacyTextPrivacy": "politiques de confidentialité",
     "privacyTextAnd": " et ",
     "privacyTextTerms": "conditions générales d’utilisation et de services",
-    "createGroupLimitationWarning": "Seul.es les utilisateur.ices Tawkie peuvent être rajouté.es aux groupes."
+    "createGroupLimitationWarning": "Seul.es les utilisateur.ices Tawkie peuvent être rajouté.es aux groupes.",
+    "discordConnectionTitle": "Connectez-vous à Discord",
+    "discordConnectToQrCode": "Connexion via QR code",
+    "discordConnectUsernamePassword": "Connexion avec votre nom d'utilisateur et mot de passe",
+    "discordQrExplainOne": "Sur votre téléphone principal",
+    "discordQrExplainTwo": "Allez dans votre application Discord",
+    "discordQrExplainTree": "Dans l'onglet de votre profil, allez dans la liste des paramètres",
+    "discordQrExplainFour": "Cliquez sur SCAN QR CODE",
+    "discordQrExplainFive": "Vous pouvez également cliquer directement sur ce lien pour aller au bon endroit dans votre application Discord",
+    "discordQrExplainSix": "Nous vous conseillons d'ouvrir ce QR code sur un ordinateur et de le scanner avec votre téléphone.",
+    "discordQrExplainSeven": "ATTENTION",
+    "discordQrExplainEight": "Ce QR code expire rapidement.",
+    "discordQrExplainNine": "Scannez ce QR Code"
 }
