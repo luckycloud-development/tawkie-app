@@ -64,6 +64,7 @@ Future<void> connectToWhatsApp(BuildContext context,
                     qrCode: result!.qrCode!,
                     code: result!.code!,
                     botConnection: botConnection,
+                    socialNetwork: network,
                   ),
             ),
           ) ??

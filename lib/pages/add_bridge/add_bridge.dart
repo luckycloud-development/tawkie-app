@@ -574,6 +574,7 @@ class BotController extends State<AddBridge> {
                     qrCode: result!.qrCode!,
                     code: result!.urlLink!,
                     botConnection: this,
+                    socialNetwork: network,
                   ),
                 ),
               );
@@ -868,16 +869,24 @@ class BotController extends State<AddBridge> {
     }
   }
 
-  Future<String> fetchDataWhatsApp() async {
-    final SocialNetwork? whatsAppNetwork = getWhatsAppNetwork();
-    if (whatsAppNetwork == null) {
-      throw Exception("WhatsApp network not found");
+  Future<String> fetchData(SocialNetwork network) async {
+    final String botUserId = '${network.chatBot}$hostname';
+
+    RegExp successMatch;
+    RegExp timeOutMatch;
+
+    switch (network.name) {
+      case "WhatsApp":
+        successMatch = LoginRegex.whatsAppSuccessMatch;
+        timeOutMatch = LoginRegex.whatsAppTimeoutMatch;
+        break;
+      case "Discord":
+        successMatch = LoginRegex.discordSuccessMatch;
+        timeOutMatch = LoginRegex.discordTimeoutMatch;
+        break;
+      default:
+        throw Exception("Unsupported network: ${network.name}");
     }
-
-    final String botUserId = '${whatsAppNetwork.chatBot}$hostname';
-
-    final RegExp successMatch = LoginRegex.whatsAppSuccessMatch;
-    final RegExp timeOutMatch = LoginRegex.whatsAppTimeoutMatch;
 
     String? directChat = client.getDirectChatFromUserId(botUserId);
     directChat ??= await client.startDirectChat(botUserId);
@@ -885,8 +894,7 @@ class BotController extends State<AddBridge> {
     String result = "Not logged";
 
     while (continueProcess) {
-      result = await _checkLatestMessages(
-          directChat, successMatch, timeOutMatch, whatsAppNetwork);
+      result = await _checkLatestMessages(directChat, successMatch, timeOutMatch, network);
 
       if (result != "Not logged") {
         break;
