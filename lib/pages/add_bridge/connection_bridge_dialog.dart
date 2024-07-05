@@ -16,11 +16,9 @@ import 'model/social_network.dart';
 GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 // ShowDialog for WhatsApp connection
-Future<void> connectToWhatsApp(
-  BuildContext context,
-  SocialNetwork network,
-  BotController botConnection,
-) async {
+Future<void> connectToWhatsApp(BuildContext context,
+    SocialNetwork network,
+    BotController botConnection,) async {
   final Completer<bool> completer = Completer<bool>();
 
   final TextEditingController controller = TextEditingController();
@@ -36,11 +34,11 @@ Future<void> connectToWhatsApp(
       formKey.currentState!.save(); // Save form values
 
       final connectionStateModel =
-          Provider.of<ConnectionStateModel>(context, listen: false);
+      Provider.of<ConnectionStateModel>(context, listen: false);
 
       try {
         WhatsAppResult?
-            result; // Variable to store the result of the connection
+        result; // Variable to store the result of the connection
 
         // To show Loading while executing the function
         await showCustomLoadingDialog(
@@ -59,16 +57,16 @@ Future<void> connectToWhatsApp(
         } else if (result?.result == "scanTheCode") {
           // ShowDialog for code and QR Code login
           final bool success = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => QRCodeConnectPage(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  QRCodeConnectPage(
                     qrCode: result!.qrCode!,
                     code: result!.code!,
                     botConnection: botConnection,
-                    socialNetwork: network,
                   ),
-                ),
-              ) ??
+            ),
+          ) ??
               false;
 
           if (success == true) {
@@ -144,101 +142,4 @@ Future<void> connectToWhatsApp(
       );
     },
   );
-}
-
-// ShowDialog for Discord !isMobile connection
-Future<bool> connectToDiscord(
-  BuildContext context,
-  SocialNetwork network,
-  BotBridgeConnection botConnection,
-) async {
-  final Completer<bool> completer = Completer<bool>();
-
-  final TextEditingController controller = TextEditingController();
-
-  // login functions for discord
-  Future<void> discordQrLoginFunction({
-    required BuildContext context,
-    required BotBridgeConnection botConnection,
-  }) async {
-    try {
-      DiscordResult? result; // Variable to store the result of the connection
-
-      // To show Loading while executing the function
-      await showCustomLoadingDialog(
-        context: context,
-        future: () async {
-          result =
-              await botConnection.createBridgeDiscordQRCode(context, network);
-        },
-      );
-
-      if (result?.result == "Error logging in: websocket: close sent") {
-        // Display a showDialog with an error message related to the password
-        showCatchErrorDialog(context, L10n.of(context)!.err_timeOut);
-      } else {
-        // ShowDialog for code and QR Code login
-        final bool success = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QRCodeConnectPage(
-                  qrCode: result!.qrCode!,
-                  code: result!.urlLink!,
-                  botConnection: botConnection,
-                  socialNetwork: network,
-                ),
-              ),
-            ) ??
-            false;
-
-        if (success == true) {
-          Navigator.of(context).pop();
-          completer.complete(
-            true,
-          ); // returns True if the connection is successful
-        }
-      }
-    } catch (e) {
-      Navigator.of(context).pop();
-      //To view other catch-related errors
-      showCatchErrorDialog(context, e);
-    }
-  }
-
-  // ShowDialog of the phone number to connect to WhatsApp
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Center(
-        child: SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "${L10n.of(context)!.connectYourSocialAccount} ${network.name}",
-              style: const TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: TextButton(
-              onPressed: () async {
-                await discordQrLoginFunction(
-                  context: context,
-                  botConnection: botConnection,
-                );
-              },
-              child: Text(
-                L10n.of(context)!.discord_connectToQrCode,
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-
-  return completer.future;
 }
