@@ -216,7 +216,6 @@ class AuthController extends State<Auth> {
 
   Future<void> matrixLogin(String matrixLoginJwt, String serverName) async {
     final matrix = Matrix.of(context);
-    final client = matrix.getLoginClient();
 
     setState(() => loading = true);
 
@@ -243,13 +242,14 @@ class AuthController extends State<Auth> {
         final deviceId = responseData['device_id'];
 
         // Initialize with recovered data
-        await client.init(
+        await matrix.getLoginClient().init(
           newToken: accessToken,
           newUserID: userId,
           newHomeserver: homeserver,
           newDeviceID: deviceId,
           newDeviceName: PlatformInfos.clientName,
         );
+
       } else {
         Logs().v('Request failed with status: ${response.statusCode}');
         // Improved error handling
