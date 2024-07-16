@@ -7,8 +7,8 @@ class SocialNetwork {
   final String chatBot; // ChatBot for send demand
   final String? urlLogin;
   final String? urlRedirect;
-  bool? loading; // To find out if state is loading
-  bool? connected; // To find out if state is disconnected
+  bool loading; // To find out if state is loading
+  bool connected; // To find out if state is disconnected
   bool error; // Bool to indicate if there is an error
 
   SocialNetwork({
@@ -59,7 +59,7 @@ class SocialNetworkManager {
       logo: Logo(Logos.facebook_messenger),
       name: "Facebook Messenger",
       chatBot: "@messenger2bot:",
-      urlLogin: "https://www.messenger.com/",
+      urlLogin: "https://www.messenger.com/login/",
       urlRedirect: "https://www.messenger.com/t/",
     ),
     SocialNetwork(
@@ -88,4 +88,10 @@ class SocialNetworkManager {
         urlLogin: "https://discord.com/login",
     ),
   ];
+
+  static SocialNetwork? fromName(String name) {
+    return socialNetworks.firstWhere(
+          (network) => network.name == name,
+    );
+  }
 }
