@@ -134,28 +134,6 @@ class _WebViewConnectionState extends State<WebViewConnection> {
           await _clearCookiesAndData();
         },
         onLoadStop: (InAppWebViewController controller, Uri? url) async {
-          // Inject JavaScript to force desktop view for Facebook and Discord
-          if (widget.network.name == "Facebook Messenger" ||
-              widget.network.name == "Discord") {
-            await controller
-                .evaluateJavascript(source: forceDesktopView)
-                .then((result) {
-              // Handle the result if necessary
-            }).catchError((error) {
-              // Handle the error if necessary
-            });
-          }
-
-          if (widget.network.name == "Discord" && !PlatformInfos.isIOS) {
-            await controller
-                .evaluateJavascript(source: zoomDiscord)
-                .then((result) {
-              // Handle the result if necessary
-            }).catchError((error) {
-              // Handle the error if necessary
-            });
-          }
-
           // Check the URL when the page finishes loading
           switch (widget.network.name) {
             case "Facebook Messenger":

@@ -1,9 +1,3 @@
-const String forceDesktopView = """
-  var meta = document.createElement('meta');
-  meta.name = 'viewport';
-  meta.content = 'width=1024';
-  document.getElementsByTagName('head')[0].appendChild(meta);
-""";
 
 const String zoomFacebook = """
   (function() {
