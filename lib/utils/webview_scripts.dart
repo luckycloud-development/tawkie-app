@@ -118,6 +118,28 @@ const String applyCustomStylesMessenger = """
   }
 """;
 
+const String replaceDiscordElementContent = """
+  function replaceElementContent() {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        var element = document.querySelector('h2[data-text-variant="heading-xl/semibold"]');
+        if (element) {
+          element.textContent = '';
+          element.style.marginBottom = '20px';
+          console.log("Element content replaced with an empty space and margin added");
+          observer.disconnect(); // Stop observing after the element content is replaced
+        }
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+  replaceElementContent();
+""";
+
 String getCombinedScriptMessenger() {
   return """
     $declineCookiesMessenger
@@ -138,6 +160,13 @@ String getCombinedScriptLinkedin() {
   return """
     $declineCookiesLinkedin
     declineCookies();
+  """;
+}
+
+String getCombinedScriptDiscord() {
+  return """
+    $replaceDiscordElementContent
+    replaceElementContent();
   """;
 }
 

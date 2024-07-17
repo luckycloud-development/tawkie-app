@@ -87,6 +87,9 @@ class _WebViewConnectionState extends State<WebViewConnection> {
         case SocialNetworkEnum.Linkedin:
           await _webViewController!.evaluateJavascript(source: getCombinedScriptLinkedin());
           break;
+        case SocialNetworkEnum.Discord:
+          await _webViewController!.evaluateJavascript(source: getCombinedScriptDiscord());
+          break;
         default:
           return; // Or throw an exception if you prefer
       }
@@ -199,7 +202,14 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                 await _addCustomStyle();
               }
               break;
+
+            case "Discord":
+              if (!_discordBridgeCreated && url != null) {
+                await _addCustomStyle();
+              }
+              break;
           }
+
 
           if (widget.network.connected && !_isDisposed) {
             // Close the current page
