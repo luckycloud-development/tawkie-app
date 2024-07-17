@@ -906,16 +906,18 @@ class BotController extends State<AddBridge> {
 
   Future<String> fetchData(SocialNetwork network) async {
     final String botUserId = '${network.chatBot}$hostname';
+    final SocialNetworkEnum? networkEnum =
+    getSocialNetworkEnum(network.name);
 
     RegExp successMatch;
     RegExp timeOutMatch;
 
-    switch (network.name) {
-      case "WhatsApp":
+    switch (networkEnum) {
+      case SocialNetworkEnum.WhatsApp:
         successMatch = LoginRegex.whatsAppSuccessMatch;
         timeOutMatch = LoginRegex.whatsAppTimeoutMatch;
         break;
-      case "Discord":
+      case SocialNetworkEnum.Discord:
         successMatch = LoginRegex.discordSuccessMatch;
         timeOutMatch = LoginRegex.discordTimeoutMatch;
         break;
