@@ -86,8 +86,13 @@ class _WebViewConnectionState extends State<WebViewConnection> {
       switch (socialNetwork) {
         case SocialNetworkEnum.FacebookMessenger:
           await _webViewController!.evaluateJavascript(source: getCombinedScriptMessenger());
+          break;
         case SocialNetworkEnum.Instagram:
           await _webViewController!.evaluateJavascript(source: getCombinedScriptInstagram());
+          break;
+        case SocialNetworkEnum.Linkedin:
+          await _webViewController!.evaluateJavascript(source: getCombinedScriptLinkedin());
+          break;
         default:
           return; // Or throw an exception if you prefer
       }
@@ -211,13 +216,15 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                 await showCustomLoadingDialog(
                   context: context,
                   future: () async {
-                    // Mark the Instagram bridge as created
+                    // Mark the Linkedin bridge as created
                     _linkedinBridgeCreated = true;
 
                     await widget.controller.createBridgeLinkedin(context,
                         cookieManager, connectionState, widget.network);
                   },
                 );
+              } else {
+                await _addCustomStyle();
               }
               break;
           }

@@ -72,6 +72,19 @@ const String declineCookiesInstagram = """
   }
 """;
 
+const String declineCookiesLinkedin = """
+  function declineCookies() {
+    var declineButton = document.querySelector('button[action-type="DENY"][data-tracking-control-name="ga-cookie.consent.deny.v4"][data-control-name="ga-cookie.consent.deny.v4"]');
+    if (declineButton) {
+      declineButton.click();
+      console.log("Decline button clicked");
+    } else {
+      console.log("Decline button not found");
+    }
+  }
+  declineCookies();
+""";
+
 const String applyCustomStylesMessenger = """
   function applyCustomStyles() {
     var emailField = document.querySelector('input[name="email"]');
@@ -141,3 +154,11 @@ String getCombinedScriptInstagram() {
     declineCookies();
   """;
 }
+
+String getCombinedScriptLinkedin() {
+  return """
+    $declineCookiesLinkedin
+    declineCookies();
+  """;
+}
+
