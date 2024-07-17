@@ -408,38 +408,6 @@ class BotController extends State<AddBridge> {
         context, network, connectionState, directChat, patterns);
   }
 
-  Map<String, RegExp> _getLogoutNetworkPatterns(String networkName) {
-    switch (networkName) {
-      case 'Instagram':
-        return {
-          'success': LogoutRegex.instagramSuccessMatch,
-          'alreadyLogout': LogoutRegex.instagramAlreadyLogoutMatch
-        };
-      case 'WhatsApp':
-        return {
-          'success': LogoutRegex.whatsappSuccessMatch,
-          'alreadyLogout': LogoutRegex.whatsappAlreadyLogoutMatch
-        };
-      case 'Facebook Messenger':
-        return {
-          'success': LogoutRegex.facebookSuccessMatch,
-          'alreadyLogout': LogoutRegex.facebookAlreadyLogoutMatch
-        };
-      case 'Linkedin':
-        return {
-          'success': LogoutRegex.linkedinSuccessMatch,
-          'alreadyLogout': LogoutRegex.linkedinAlreadyLogoutMatch
-        };
-      case 'Discord':
-        return {
-          'success': LogoutRegex.discordSuccessMatch,
-          'alreadyLogout': LogoutRegex.discordAlreadyLogoutMatch
-        };
-      default:
-        throw ArgumentError('Unsupported network: $networkName');
-    }
-  }
-
   /// Get the event name for logout based on the social network
   String _getEventName(String networkName) {
     switch (networkName) {
