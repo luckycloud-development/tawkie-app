@@ -35,10 +35,12 @@ class _WebViewConnectionState extends State<WebViewConnection> {
   bool _instagramBridgeCreated = false;
   bool _linkedinBridgeCreated = false;
   bool _discordBridgeCreated = false;
+  late SocialNetworkEnum socialNetwork;
 
   @override
   void initState() {
     super.initState();
+    socialNetwork = getSocialNetworkEnum(widget.network.name)!;
     _clearCookiesAndData();
   }
 
@@ -73,7 +75,6 @@ class _WebViewConnectionState extends State<WebViewConnection> {
 
   // Add custom style to the login page to make it more user-friendly
   Future<void> _addCustomStyle() async {
-    final socialNetwork = getSocialNetworkEnum(widget.network.name);
     if (_webViewController != null) {
       switch (socialNetwork) {
         case SocialNetworkEnum.FacebookMessenger:
@@ -134,8 +135,8 @@ class _WebViewConnectionState extends State<WebViewConnection> {
         },
         onLoadStop: (InAppWebViewController controller, Uri? url) async {
           // Check the URL when the page finishes loading
-          switch (widget.network.name) {
-            case "Facebook Messenger":
+          switch (socialNetwork) {
+            case SocialNetworkEnum.FacebookMessenger:
               final successfullyRedirected = !_facebookBridgeCreated &&
                   url != null &&
                   url.toString() != widget.network.urlLogin! &&
@@ -160,7 +161,7 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               }
               break;
 
-            case "Instagram":
+            case SocialNetworkEnum.Instagram:
               final successfullyRedirected = !_instagramBridgeCreated &&
                   url != null &&
                   url.toString() != widget.network.urlLogin! &&
@@ -184,7 +185,7 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               }
               break;
 
-            case "Linkedin":
+            case SocialNetworkEnum.Linkedin:
               if (!_linkedinBridgeCreated &&
                   url != null &&
                   url.toString().contains(widget.network.urlRedirect!)) {
@@ -205,10 +206,13 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               }
               break;
 
-            case "Discord":
+            case SocialNetworkEnum.Discord:
               if (!_discordBridgeCreated && url != null) {
                 await _addCustomStyle();
               }
+              break;
+            default:
+              // Handle default case or other social networks if necessary
               break;
           }
 
@@ -222,8 +226,8 @@ class _WebViewConnectionState extends State<WebViewConnection> {
         },
         onReceivedHttpError: (InAppWebViewController controller,
             WebResourceRequest request, WebResourceResponse response) async {
-          switch (widget.network.name) {
-            case "Discord":
+          switch (socialNetwork) {
+            case SocialNetworkEnum.Discord:
               String? authorizationHeaderValue = widget.controller
                   .extractAuthorizationHeader(request.headers!);
 
@@ -247,7 +251,9 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                 Navigator.pop(context);
               }
               break;
-            // Other network
+            default:
+              // Handle default case or other social networks if necessary
+              break;
           }
         },
       ),
