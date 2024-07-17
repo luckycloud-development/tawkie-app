@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:tawkie/pages/add_bridge/add_bridge.dart';
+import 'package:tawkie/utils/bridge_utils.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/utils/webview_scripts.dart';
 import 'package:tawkie/widgets/future_loading_dialog_custom.dart';
@@ -78,17 +79,17 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     return widget.network.name == 'Facebook Messenger';
   }
 
-  bool _isInstagram() {
-    return widget.network.name == 'Instagram';
-  }
-
   // Add custom style to the login page to make it more user-friendly
   Future<void> _addCustomStyle() async {
+    final socialNetwork = getSocialNetworkEnum(widget.network.name);
     if (_webViewController != null) {
-      if (_isMessenger()) {
-        await _webViewController!.evaluateJavascript(source: getCombinedScriptMessenger());
-      } else if (_isInstagram()) {
-        await _webViewController!.evaluateJavascript(source: getCombinedScriptInstagram());
+      switch (socialNetwork) {
+        case SocialNetworkEnum.FacebookMessenger:
+          await _webViewController!.evaluateJavascript(source: getCombinedScriptMessenger());
+        case SocialNetworkEnum.Instagram:
+          await _webViewController!.evaluateJavascript(source: getCombinedScriptInstagram());
+        default:
+          return; // Or throw an exception if you prefer
       }
     }
   }
