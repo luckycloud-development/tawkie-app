@@ -47,14 +47,9 @@ class _WebViewConnectionState extends State<WebViewConnection> {
 
   Future<void> _clearCookiesAndData() async {
     await cookieManager.clearCookies();
+    // Clear localStorage and sessionStorage
     if (_webViewController != null) {
-      await _webViewController!
-          .evaluateJavascript(source: clearCookiesAndStorage)
-          .then((result) {
-        // Handle the result if necessary
-      }).catchError((error) {
-        // Handle the error if necessary
-      });
+      await _webViewController!.evaluateJavascript(source: clearCookiesAndStorage);
     }
   }
 
