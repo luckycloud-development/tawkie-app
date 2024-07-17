@@ -1,10 +1,3 @@
-const String zoomDiscord = """
-  (function() {
-    document.body.style.zoom = "1.2";
-    window.scrollTo(0, 0);
-  })();
-""";
-
 const String clearCookiesAndStorage = """
   (function() {
     // Clear cookies
