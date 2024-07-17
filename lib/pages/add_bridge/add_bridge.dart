@@ -240,42 +240,6 @@ class BotController extends State<AddBridge> {
     }
   }
 
-  RegExpPingPatterns _getPingPatterns(String networkName) {
-    switch (networkName) {
-      case "WhatsApp":
-        return RegExpPingPatterns(
-          PingPatterns.whatsAppOnlineMatch,
-          PingPatterns.whatsAppNotLoggedMatch,
-          PingPatterns.whatsAppLoggedButNotConnectedMatch,
-        );
-      case "Facebook Messenger":
-        return RegExpPingPatterns(
-          PingPatterns.facebookOnlineMatch,
-          PingPatterns.facebookNotLoggedMatch,
-          PingPatterns.facebookNotLoggedAnymoreMatch,
-        );
-      case "Instagram":
-        return RegExpPingPatterns(
-          PingPatterns.instagramOnlineMatch,
-          PingPatterns.instagramNotLoggedMatch,
-          PingPatterns.instagramNotLoggedAnymoreMatch,
-        );
-      case "Linkedin":
-        return RegExpPingPatterns(
-          PingPatterns.linkedinOnlineMatch,
-          PingPatterns.linkedinNotLoggedMatch,
-        );
-      case "Discord":
-        return RegExpPingPatterns(
-          PingPatterns.discordOnlineMatch,
-          PingPatterns.discordNotLoggedMatch,
-        );
-      default:
-        throw Exception("Unsupported social network: $networkName");
-    }
-  }
-
-
   void _onNewPingMessage(
     Room roomBot,
     SocialNetwork socialNetwork,
