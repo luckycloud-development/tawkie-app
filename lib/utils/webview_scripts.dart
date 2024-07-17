@@ -1,11 +1,3 @@
-
-const String zoomFacebook = """
-  (function() {
-    document.body.style.zoom = "1.5";
-    window.scrollTo(0, 0);
-  })();
-""";
-
 const String zoomDiscord = """
   (function() {
     document.body.style.zoom = "1.2";
