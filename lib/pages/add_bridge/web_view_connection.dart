@@ -30,14 +30,11 @@ class _WebViewConnectionState extends State<WebViewConnection> {
   InAppWebViewController? _webViewController;
   final cookieManager = WebviewCookieManager();
   bool _isDisposed = false; // Variable to track widget status
-  bool _facebookBridgeCreated =
-      false; // Variable to track if the Facebook bridge has been created
-  bool _instagramBridgeCreated =
-      false; // Variable to track if the Instagram bridge has been created
-  bool _linkedinBridgeCreated =
-      false; // Variable to track if the Linkedin bridge has been created
-  bool _discordBridgeCreated =
-      false; // Variable to track if the Discord bridge has been created
+  // track if the Facebook bridge has been created
+  bool _facebookBridgeCreated = false;
+  bool _instagramBridgeCreated = false;
+  bool _linkedinBridgeCreated = false;
+  bool _discordBridgeCreated = false;
 
   @override
   void initState() {
@@ -49,7 +46,8 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     await cookieManager.clearCookies();
     // Clear localStorage and sessionStorage
     if (_webViewController != null) {
-      await _webViewController!.evaluateJavascript(source: clearCookiesAndStorage);
+      await _webViewController!
+          .evaluateJavascript(source: clearCookiesAndStorage);
     }
   }
 
@@ -79,16 +77,20 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     if (_webViewController != null) {
       switch (socialNetwork) {
         case SocialNetworkEnum.FacebookMessenger:
-          await _webViewController!.evaluateJavascript(source: getCombinedScriptMessenger());
+          await _webViewController!
+              .evaluateJavascript(source: getCombinedScriptMessenger());
           break;
         case SocialNetworkEnum.Instagram:
-          await _webViewController!.evaluateJavascript(source: getCombinedScriptInstagram());
+          await _webViewController!
+              .evaluateJavascript(source: getCombinedScriptInstagram());
           break;
         case SocialNetworkEnum.Linkedin:
-          await _webViewController!.evaluateJavascript(source: getCombinedScriptLinkedin());
+          await _webViewController!
+              .evaluateJavascript(source: getCombinedScriptLinkedin());
           break;
         case SocialNetworkEnum.Discord:
-          await _webViewController!.evaluateJavascript(source: getCombinedScriptDiscord());
+          await _webViewController!
+              .evaluateJavascript(source: getCombinedScriptDiscord());
           break;
         default:
           return; // Or throw an exception if you prefer
@@ -177,7 +179,7 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                         cookieManager, connectionState, widget.network);
                   },
                 );
-              }else{
+              } else {
                 await _addCustomStyle();
               }
               break;
@@ -209,7 +211,6 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               }
               break;
           }
-
 
           if (widget.network.connected && !_isDisposed) {
             // Close the current page
