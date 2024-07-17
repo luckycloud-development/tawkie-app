@@ -78,11 +78,18 @@ class _WebViewConnectionState extends State<WebViewConnection> {
     return widget.network.name == 'Facebook Messenger';
   }
 
+  bool _isInstagram() {
+    return widget.network.name == 'Instagram';
+  }
+
   // Add custom style to the login page to make it more user-friendly
   Future<void> _addCustomStyle() async {
-    if (_isMessenger() && _webViewController != null) {
-      await _webViewController!
-          .evaluateJavascript(source: getCombinedScriptMessenger());
+    if (_webViewController != null) {
+      if (_isMessenger()) {
+        await _webViewController!.evaluateJavascript(source: getCombinedScriptMessenger());
+      } else if (_isInstagram()) {
+        await _webViewController!.evaluateJavascript(source: getCombinedScriptInstagram());
+      }
     }
   }
 
@@ -133,26 +140,6 @@ class _WebViewConnectionState extends State<WebViewConnection> {
             });
           }
 
-          // Inject JavaScript to accept cookies automatically and not get the message when the page opens
-          await controller
-              .evaluateJavascript(source: acceptCookies)
-              .then((result) {
-            // Handle the result if necessary
-          }).catchError((error) {
-            // Handle the error if necessary
-          });
-
-          // Inject JavaScript for specific zoom behavior for Facebook and Discord
-          if (widget.network.name == "Facebook Messenger") {
-            await controller
-                .evaluateJavascript(source: zoomFacebook)
-                .then((result) {
-              // Handle the result if necessary
-            }).catchError((error) {
-              // Handle the error if necessary
-            });
-          }
-
           if (widget.network.name == "Discord" && !PlatformInfos.isIOS) {
             await controller
                 .evaluateJavascript(source: zoomDiscord)
@@ -191,10 +178,12 @@ class _WebViewConnectionState extends State<WebViewConnection> {
               break;
 
             case "Instagram":
-              if (!_instagramBridgeCreated &&
+              final successfullyRedirected = !_instagramBridgeCreated &&
                   url != null &&
                   url.toString() != widget.network.urlLogin! &&
-                  url.toString().contains(widget.network.urlRedirect!)) {
+                  url.toString().contains(widget.network.urlRedirect!);
+
+              if (successfullyRedirected) {
                 // Close the WebView
                 await _closeWebView();
                 await showCustomLoadingDialog(
@@ -207,6 +196,8 @@ class _WebViewConnectionState extends State<WebViewConnection> {
                         cookieManager, connectionState, widget.network);
                   },
                 );
+              }else{
+                await _addCustomStyle();
               }
               break;
 
