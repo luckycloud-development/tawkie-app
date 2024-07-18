@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:matrix/matrix.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +25,13 @@ void main() async {
   // To make sure that the parts of flutter needed are started up already, we need to ensure that the
   // widget bindings are initialized already.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Matomo Tracker
+  await MatomoTracker.instance.initialize(
+    siteId: '1',
+    url: 'https://metrics.staging.tawkie.fr/matomo.php',
+  );
+
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();
   }
