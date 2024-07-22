@@ -19,15 +19,6 @@ class TrackingService extends ChangeNotifier {
       print("Stopwatch stopped: $elapsedTime ms");
     }
 
-    MatomoTracker.instance.trackEvent(
-      eventInfo: EventInfo(
-        category: 'bridge',
-        action: 'connection',
-        name: eventName,
-        value: elapsedTime.toDouble(),
-      ),
-    );
-
     _stopwatch.reset();
     notifyListeners();
   }

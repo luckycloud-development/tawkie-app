@@ -5,12 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 import 'package:tawkie/pages/add_bridge/add_bridge_body.dart';
 import 'package:tawkie/pages/add_bridge/service/hostname.dart';
 import 'package:tawkie/pages/add_bridge/service/reg_exp_pattern.dart';
 import 'package:tawkie/pages/add_bridge/show_bottom_sheet.dart';
 import 'package:tawkie/pages/add_bridge/success_message.dart';
 import 'package:tawkie/pages/add_bridge/web_view_connection.dart';
+import 'package:tawkie/services/matomo/tracking_service.dart';
 import 'package:tawkie/utils/bridge_utils.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
@@ -53,6 +55,9 @@ class BotController extends State<AddBridge> {
 
   // Map to store StreamSubscriptions for each social network
   final Map<String, StreamSubscription> _pingSubscriptions = {};
+
+  // Indicator for first successful tracking connection
+  bool _isFirstConnectionTracked = false;
 
   @override
   void initState() {
@@ -194,6 +199,14 @@ class BotController extends State<AddBridge> {
 
       // Wait for the ping response
       await _processPingResponse(socialNetwork, completer);
+
+      if (!_isFirstConnectionTracked && socialNetwork.connected) {
+        _isFirstConnectionTracked = true;
+        final trackingService =
+            Provider.of<TrackingService>(context, listen: false);
+
+        await trackingService.trackConnectionTimes();
+      }
     } catch (e) {
       Logs().v("Error processing ping response: ${e.toString()}");
       _handleError(socialNetwork, ConnectionError.unknown);
