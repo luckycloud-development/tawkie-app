@@ -38,4 +38,17 @@ class TrackingService extends ChangeNotifier {
       ),
     );
   }
+
+  void trackAuthError(String authType, String errorType) {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'auth',
+        action: authType,
+        name: errorType,
+      ),
+    );
+    if (kDebugMode) {
+      print('Auth error tracked: $authType - $errorType');
+    }
+  }
 }
