@@ -101,6 +101,11 @@ class AuthController extends State<Auth> {
     }
   }
 
+  Future<void> storeUserCreatedIndicator() async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    await secureStorage.write(key: 'userCreated', value: 'true');
+  }
+  
   Future<void> storeSessionToken(String? sessionToken) async {
     if (sessionToken != null) {
       await _secureStorage.write(key: 'sessionToken', value: sessionToken);
