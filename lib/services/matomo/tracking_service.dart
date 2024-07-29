@@ -51,4 +51,17 @@ class TrackingService extends ChangeNotifier {
       print('Auth error tracked: $authType - $errorType');
     }
   }
+
+  void trackBridgeConnectionFailure(String bridgeName, String errorMessage) {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'bridge',
+        action: 'connection_failure',
+        name: '$bridgeName error_message: $errorMessage',
+      ),
+    );
+    if (kDebugMode) {
+      print('Bridge connection failure tracked: $bridgeName - $errorMessage');
+    }
+  }
 }

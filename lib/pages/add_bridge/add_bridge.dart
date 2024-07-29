@@ -346,12 +346,17 @@ class BotController extends State<AddBridge> {
 
     Logs().v(errorMessage);
 
+    // Track the connection failure
+    final trackingService = Provider.of<TrackingService>(context, listen: false);
+
     if (lastMessage != null) {
       showCatchErrorDialog(
           context, "${L10n.of(context)!.errorSendUsProblem} $lastMessage");
+      trackingService.trackBridgeConnectionFailure(socialNetwork.name, lastMessage);
     } else {
       showCatchErrorDialog(context,
           "${L10n.of(context)!.errorConnectionText}.\n\n${L10n.of(context)!.errorSendUsProblem} $errorMessage");
+      trackingService.trackBridgeConnectionFailure(socialNetwork.name, errorMessage);
     }
   }
 
