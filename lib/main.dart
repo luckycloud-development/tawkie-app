@@ -15,6 +15,7 @@ import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/services/matomo/tracking_service.dart';
 import 'package:tawkie/utils/client_manager.dart';
 import 'package:tawkie/utils/platform_infos.dart';
+import 'package:tawkie/utils/secure_storage.dart';
 import 'package:tawkie/widgets/error_widget.dart';
 import 'config/setting_keys.dart';
 import 'utils/background_push.dart';
@@ -107,6 +108,11 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   final firstClient = clients.firstOrNull;
   await firstClient?.roomsLoading;
   await firstClient?.accountDataLoading;
+
+  // Check if the user is already connected
+  if (firstClient != null) {
+    await SecureStorageUtil.clearUserCreatedIndicator();
+  }
 
   ErrorWidget.builder = (details) => FluffyChatErrorWidget(details);
   runApp(

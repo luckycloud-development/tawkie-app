@@ -21,6 +21,7 @@ import 'package:tawkie/pages/auth/privacy_policy_text.dart';
 import 'package:tawkie/pages/auth/register_view.dart';
 import 'package:tawkie/pages/auth/web_login.dart';
 import 'package:tawkie/utils/platform_infos.dart';
+import 'package:tawkie/utils/secure_storage.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:tawkie/widgets/show_error_dialog.dart';
 
@@ -43,7 +44,6 @@ class AuthController extends State<Auth> {
   bool loading = true;
   String baseUrl = AppConfig.baseUrl;
   late final Dio dio;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   kratos.FrontendApi? api;
   String? flowId;
@@ -63,7 +63,7 @@ class AuthController extends State<Auth> {
     if (widget.authType == AuthType.login) {
       getLoginOry();
       // Check if sessionToken exists and handle it
-      getSessionToken().then((sessionToken) {
+      SecureStorageUtil.getSessionToken().then((sessionToken) {
         if (sessionToken != null) {
           checkUserQueueState(sessionToken);
         }
@@ -99,21 +99,6 @@ class AuthController extends State<Auth> {
         getRegisterOry();
       }
     }
-  }
-
-  Future<void> storeUserCreatedIndicator() async {
-    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    await secureStorage.write(key: 'userCreated', value: 'true');
-  }
-  
-  Future<void> storeSessionToken(String? sessionToken) async {
-    if (sessionToken != null) {
-      await _secureStorage.write(key: 'sessionToken', value: sessionToken);
-    }
-  }
-
-  Future<String?> getSessionToken() async {
-    return await _secureStorage.read(key: 'sessionToken');
   }
 
   bool _validateEmail(String email) {
@@ -172,6 +157,8 @@ class AuthController extends State<Auth> {
       Logs().v('Logging in with JWT into Matrix');
       // Connect with JWT and server name
       await matrixLogin(matrixLoginJwt, serverName);
+
+      await SecureStorageUtil.clearUserCreatedIndicator();
 
       // If all goes well, reset passwordError
       //setState(() => passwordError = null);
@@ -741,7 +728,8 @@ class AuthController extends State<Auth> {
       );
 
       final sessionToken = registerResponse.data?.sessionToken;
-      await storeSessionToken(sessionToken);
+      await SecureStorageUtil.storeSessionToken(sessionToken);
+      await SecureStorageUtil.storeUserCreatedIndicator();
 
       Logs().v('Registration successful');
       context.go('/home/login');
@@ -805,7 +793,7 @@ class AuthController extends State<Auth> {
       }
 
       final sessionToken = loginResponse.data?.sessionToken;
-      await storeSessionToken(sessionToken);
+      await SecureStorageUtil.storeSessionToken(sessionToken);
       return checkUserQueueState(sessionToken!);
     } on MatrixException catch (exception) {
       setState(() => messageError = exception.errorMessage);
