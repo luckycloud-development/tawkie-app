@@ -14,6 +14,7 @@ import 'package:tawkie/pages/add_bridge/success_message.dart';
 import 'package:tawkie/pages/add_bridge/web_view_connection.dart';
 import 'package:tawkie/services/matomo/tracking_service.dart';
 import 'package:tawkie/utils/bridge_utils.dart';
+import 'package:tawkie/utils/secure_storage.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -200,7 +201,9 @@ class BotController extends State<AddBridge> {
       // Wait for the ping response
       await _processPingResponse(socialNetwork, completer);
 
-      if (!_isFirstConnectionTracked && socialNetwork.connected) {
+      final userCreatedIndicator = await SecureStorageUtil.checkUserCreatedIndicator();
+
+      if (!_isFirstConnectionTracked && socialNetwork.connected && userCreatedIndicator == 'true') {
         _isFirstConnectionTracked = true;
         final trackingService =
             Provider.of<TrackingService>(context, listen: false);
@@ -850,7 +853,6 @@ class BotController extends State<AddBridge> {
     }
   }
 
-  /// Check last received message for WhatsApp
   /// Check last received message for WhatsApp
   void _onWhatsAppMessage(
       String directChat,
