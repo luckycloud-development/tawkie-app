@@ -78,4 +78,18 @@ class TrackingService extends ChangeNotifier {
       print('Bridge add attempt tracked: $bridgeName');
     }
   }
+
+  // Method to track bridges used by the user
+  void trackBridgeUsed(String bridgeName) {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'bridge',
+        action: 'used',
+        name: bridgeName,
+      ),
+    );
+    if (kDebugMode) {
+      print('Bridge used tracked: $bridgeName');
+    }
+  }
 }
