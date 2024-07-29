@@ -64,4 +64,18 @@ class TrackingService extends ChangeNotifier {
       print('Bridge connection failure tracked: $bridgeName - $errorMessage');
     }
   }
+
+  // Method to track attempts to add a bridge
+  void trackBridgeAddAttempt(String bridgeName) {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'bridge',
+        action: 'attempt',
+        name: bridgeName,
+      ),
+    );
+    if (kDebugMode) {
+      print('Bridge add attempt tracked: $bridgeName');
+    }
+  }
 }

@@ -596,6 +596,8 @@ class BotController extends State<AddBridge> {
           .updateConnectionTitle(L10n.of(context)!.loadingDemandToConnect);
     });
 
+    trackingService.trackBridgeAddAttempt(network.name);
+
     final gotCookies = await cookieManager.getCookies(network.urlRedirect);
 
     if (kDebugMode) {
@@ -737,6 +739,8 @@ class BotController extends State<AddBridge> {
       connectionState
           .updateConnectionTitle(L10n.of(context)!.loadingDemandToConnect);
     });
+
+    trackingService.trackBridgeAddAttempt(whatsAppNetwork.name);
 
     final RegExp successMatch = LoginRegex.whatsAppSuccessMatch;
     final RegExp alreadySuccessMatch = LoginRegex.whatsAppAlreadySuccessMatch;
@@ -908,6 +912,8 @@ class BotController extends State<AddBridge> {
       connectionState
           .updateConnectionTitle(L10n.of(context)!.loadingDemandToConnect);
     });
+
+    trackingService.trackBridgeAddAttempt(network.name);
 
     final gotCookies = await cookieManager.getCookies(network.urlRedirect);
 
