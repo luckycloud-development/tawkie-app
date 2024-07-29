@@ -51,6 +51,7 @@ class BotController extends State<AddBridge> {
 
   late Client client;
   late String hostname;
+  late TrackingService trackingService;
 
   List<SocialNetwork> socialNetworks = SocialNetworkManager.socialNetworks;
 
@@ -63,6 +64,7 @@ class BotController extends State<AddBridge> {
   @override
   void initState() {
     super.initState();
+    trackingService = Provider.of<TrackingService>(context, listen: false);
     matrixInit();
     handleRefresh();
   }
@@ -205,9 +207,6 @@ class BotController extends State<AddBridge> {
 
       if (!_isFirstConnectionTracked && socialNetwork.connected && userCreatedIndicator == 'true') {
         _isFirstConnectionTracked = true;
-        final trackingService =
-            Provider.of<TrackingService>(context, listen: false);
-
         await trackingService.trackConnectionTimes();
       }
     } catch (e) {
@@ -345,9 +344,6 @@ class BotController extends State<AddBridge> {
     }
 
     Logs().v(errorMessage);
-
-    // Track the connection failure
-    final trackingService = Provider.of<TrackingService>(context, listen: false);
 
     if (lastMessage != null) {
       showCatchErrorDialog(
