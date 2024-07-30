@@ -61,6 +61,9 @@ class BotController extends State<AddBridge> {
   // Indicator for first successful tracking connection
   bool _isFirstConnectionTracked = false;
 
+  // Set to keep track of social networks that have been tracked
+  final Set<String> _trackedSocialNetworks = {};
+
   @override
   void initState() {
     super.initState();
@@ -271,6 +274,12 @@ class BotController extends State<AddBridge> {
     if (isOnline(patterns.onlineMatch, lastEvent!)) {
       Logs().v("You're logged to ${socialNetwork.name}");
       _updateNetworkStatus(socialNetwork, true, false);
+      // Metric bridges used (per bridge)
+      // Track the bridge usage if not already tracked
+      if (!_trackedSocialNetworks.contains(socialNetwork.name)) {
+        _trackedSocialNetworks.add(socialNetwork.name);
+        trackingService.trackBridgeUsed(socialNetwork.name);
+      }
       if (!completer.isCompleted) {
         completer.complete();
       }
