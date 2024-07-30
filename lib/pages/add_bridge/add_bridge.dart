@@ -64,11 +64,14 @@ class BotController extends State<AddBridge> {
   // Set to keep track of social networks that have been tracked
   final Set<String> _trackedSocialNetworks = {};
 
+  late bool userCreatedIndicator;
+
   @override
   void initState() {
     super.initState();
     trackingService = Provider.of<TrackingService>(context, listen: false);
     matrixInit();
+    initializeUserCreatedIndicator();
     handleRefresh();
   }
 
@@ -78,6 +81,10 @@ class BotController extends State<AddBridge> {
     _pingSubscriptions.forEach((key, subscription) => subscription.cancel());
     continueProcess = false;
     super.dispose();
+  }
+
+  Future<void> initializeUserCreatedIndicator() async {
+    userCreatedIndicator = await SecureStorageUtil.checkUserCreatedIndicator() == 'true';
   }
 
   /// Initialize Matrix client and extract hostname
@@ -206,11 +213,8 @@ class BotController extends State<AddBridge> {
       // Wait for the ping response
       await _processPingResponse(socialNetwork, completer);
 
-      final userCreatedIndicator = await SecureStorageUtil.checkUserCreatedIndicator();
-
-      if (!_isFirstConnectionTracked && socialNetwork.connected && userCreatedIndicator == 'true') {
-        _isFirstConnectionTracked = true;
-        await trackingService.trackConnectionTimes();
+      if (!_isFirstConnectionTracked && socialNetwork.connected && userCreatedIndicator) {
+        trackingService.trackRegisterBridgeAddAttempt(socialNetwork.name);
       }
     } catch (e) {
       Logs().v("Error processing ping response: ${e.toString()}");
@@ -276,9 +280,13 @@ class BotController extends State<AddBridge> {
       _updateNetworkStatus(socialNetwork, true, false);
       // Metric bridges used (per bridge)
       // Track the bridge usage if not already tracked
-      if (!_trackedSocialNetworks.contains(socialNetwork.name)) {
-        _trackedSocialNetworks.add(socialNetwork.name);
-        trackingService.trackBridgeUsed(socialNetwork.name);
+      if (!_isFirstConnectionTracked && socialNetwork.connected && userCreatedIndicator) {
+        trackingService.trackConnectionTimes();
+      } else {
+        if (!_trackedSocialNetworks.contains(socialNetwork.name)) {
+          _trackedSocialNetworks.add(socialNetwork.name);
+          trackingService.trackBridgeUsed(socialNetwork.name);
+        }
       }
       if (!completer.isCompleted) {
         completer.complete();

@@ -31,7 +31,7 @@ class TrackingService extends ChangeNotifier {
 
     MatomoTracker.instance.trackEvent(
       eventInfo: EventInfo(
-        category: 'bridge',
+        category: 'register',
         action: 'connection',
         name: 'Average Connection Time',
         value: elapsedTime.toDouble(),
@@ -39,10 +39,24 @@ class TrackingService extends ChangeNotifier {
     );
   }
 
+  // Method to track attempts to add a bridge
+  void trackRegisterBridgeAddAttempt(String bridgeName) {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'register',
+        action: 'attempt to adds a bridge',
+        name: bridgeName,
+      ),
+    );
+    if (kDebugMode) {
+      print('Bridge add attempt tracked: $bridgeName');
+    }
+  }
+
   void trackAuthError(String authType, String errorType) {
     MatomoTracker.instance.trackEvent(
       eventInfo: EventInfo(
-        category: 'auth',
+        category: 'auth/register',
         action: authType,
         name: errorType,
       ),
