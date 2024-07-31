@@ -35,6 +35,9 @@ void main() async {
     url: 'https://metrics.staging.tawkie.fr/matomo.php',
   );
 
+  // Track app open event
+  TrackingService().trackAppOpen();
+
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();
   }

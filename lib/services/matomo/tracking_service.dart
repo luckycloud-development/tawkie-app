@@ -106,4 +106,17 @@ class TrackingService extends ChangeNotifier {
       print('Bridge used tracked: $bridgeName');
     }
   }
+
+  // Track app open event
+  void trackAppOpen() {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'usage',
+        action: 'App open',
+      ),
+    );
+    if (kDebugMode) {
+      print('App open tracked');
+    }
+  }
 }
