@@ -431,7 +431,10 @@ class ChatListController extends State<ChatList>
       }
 
       // Save application opening
-      final npsService = NPSService(requiredOpens: 5, requiredDays: 7);
+      final npsService = NPSService(
+        requiredOpens: AppConfig.requiredOpens,
+        requiredDays: AppConfig.requiredDays,
+      );
       await npsService.recordAppOpen();
 
       // NPS display check
