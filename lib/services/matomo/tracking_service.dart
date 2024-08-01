@@ -290,4 +290,17 @@ class TrackingService extends ChangeNotifier {
       print('Special message sent tracked: $messageTypeName');
     }
   }
+
+  void trackNotificationOpen() {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'notifications',
+        action: 'opened',
+      ),
+    );
+
+    if (kDebugMode) {
+      print('Notification opened tracked');
+    }
+  }
 }
