@@ -1010,6 +1010,8 @@ class ChatController extends State<ChatPageWithRoom>
           e.content.tryGetMap('m.relates_to')?['key'] == emoji,
     );
 
+    trackingService.trackMessageDoubleTap();
+
     // If the reaction event exists, it will be suppressed, Otherwise it can be added
     if (evt != null) {
       await evt.redactEvent();
