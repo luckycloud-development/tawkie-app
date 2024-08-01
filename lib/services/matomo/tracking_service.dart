@@ -11,6 +11,14 @@ enum DeviceType {
   unknown,
 }
 
+enum MessageType {
+  voice,
+  image,
+  file,
+  video,
+  location,
+}
+
 class TrackingService extends ChangeNotifier {
   final Stopwatch _stopwatch = Stopwatch();
 
@@ -247,6 +255,39 @@ class TrackingService extends ChangeNotifier {
 
     if (kDebugMode) {
       print('Message double-tap tracked in room');
+    }
+  }
+
+  void trackSpecialMessageSent(MessageType messageType) {
+    String messageTypeName;
+    switch (messageType) {
+      case MessageType.voice:
+        messageTypeName = 'voice';
+        break;
+      case MessageType.image:
+        messageTypeName = 'image';
+        break;
+      case MessageType.file:
+        messageTypeName = 'file';
+        break;
+      case MessageType.video:
+        messageTypeName = 'video';
+        break;
+      case MessageType.location:
+        messageTypeName = 'location';
+        break;
+    }
+
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'messages',
+        action: 'sent-special',
+        name: messageTypeName,
+      ),
+    );
+
+    if (kDebugMode) {
+      print('Special message sent tracked: $messageTypeName');
     }
   }
 }

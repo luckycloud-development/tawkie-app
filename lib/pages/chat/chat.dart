@@ -524,6 +524,8 @@ class ChatController extends State<ChatPageWithRoom>
         room: room,
       ),
     );
+
+    trackingService.trackSpecialMessageSent(MessageType.file);
   }
 
   void sendImageFromClipBoard(Uint8List? image) async {
@@ -565,6 +567,8 @@ class ChatController extends State<ChatPageWithRoom>
         room: room,
       ),
     );
+
+    trackingService.trackSpecialMessageSent(MessageType.image);
   }
 
   void openCameraAction() async {
@@ -608,6 +612,8 @@ class ChatController extends State<ChatPageWithRoom>
         room: room,
       ),
     );
+
+    trackingService.trackSpecialMessageSent(MessageType.video);
   }
 
   void voiceMessageAction() async {
@@ -661,6 +667,9 @@ class ChatController extends State<ChatPageWithRoom>
       );
       return null;
     });
+
+    trackingService.trackSpecialMessageSent(MessageType.voice);
+
     setState(() {
       replyEvent = null;
     });
@@ -692,6 +701,8 @@ class ChatController extends State<ChatPageWithRoom>
       context: context,
       builder: (c) => SendLocationDialog(room: room),
     );
+    trackingService.trackSpecialMessageSent(MessageType.location);
+
   }
 
   String _getSelectedEventString() {
