@@ -14,12 +14,14 @@ import 'package:matrix/matrix.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:tawkie/config/setting_keys.dart';
 import 'package:tawkie/pages/bootstrap/bootstrap_dialog.dart';
+import 'package:tawkie/services/nps_service.dart';
 import 'package:tawkie/utils/account_bundles.dart';
 import 'package:tawkie/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:tawkie/utils/url_launcher.dart';
 import 'package:tawkie/utils/voip/callkeep_manager.dart';
 import 'package:tawkie/widgets/fluffy_chat_app.dart';
 import 'package:tawkie/widgets/matrix.dart';
+import 'package:tawkie/widgets/nps_widget.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'package:tawkie/config/app_config.dart';
@@ -428,6 +430,13 @@ class ChatListController extends State<ChatList>
         Matrix.of(context).backgroundPush?.setupPush();
       }
 
+      // Save application opening
+      final npsService = NPSService(requiredOpens: 5, requiredDays: 7);
+      await npsService.recordAppOpen();
+
+      // NPS display check
+      await _checkAndShowNPS(npsService);
+
       // Workaround for system UI overlay style not applied on app start
       SystemChrome.setSystemUIOverlayStyle(
         Theme.of(context).appBarTheme.systemOverlayStyle!,
@@ -437,6 +446,15 @@ class ChatListController extends State<ChatList>
     _checkTorBrowser();
 
     super.initState();
+  }
+
+  Future<void> _checkAndShowNPS(NPSService npsService) async {
+    if (await npsService.shouldShowNPS()) {
+      showNPSDialog(context);
+
+      // Record that the NPS has been shown
+      await npsService.setNPSShown();
+    }
   }
 
   @override

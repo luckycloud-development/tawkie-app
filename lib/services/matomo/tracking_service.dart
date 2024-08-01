@@ -315,4 +315,28 @@ class TrackingService extends ChangeNotifier {
       print('Notification received tracked');
     }
   }
+
+  void trackNPSScore(int score) {
+    String category;
+    if (score >= 7) {
+      category = 'Promoteur';
+    } else if (score >= 5) {
+      category = 'Passif';
+    } else {
+      category = 'Détracteur';
+    }
+
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'NPS',
+        action: 'NPS Score',
+        name: category,
+        value: score.toDouble(),
+      ),
+    );
+
+    if (kDebugMode) {
+      print('NPS score tracked: $score, category: $category');
+    }
+  }
 }
