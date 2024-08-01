@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/services/matomo/tracking_service.dart';
+import 'package:tawkie/utils/app_lifecycle_observer.dart';
 import 'package:tawkie/utils/client_manager.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/utils/secure_storage.dart';
@@ -35,10 +36,15 @@ void main() async {
     url: 'https://metrics.staging.tawkie.fr/matomo.php',
   );
 
+  final trackingService = TrackingService();
+  final lifecycleObserver = AppLifecycleObserver(trackingService: trackingService);
+
+  WidgetsBinding.instance.addObserver(lifecycleObserver);
+
   final userUUID = await SecureStorageUtil.getUserUUID();
 
   // Track app open event
-  TrackingService().trackAppOpen(userUUID!);
+  trackingService.trackAppOpen(userUUID!);
 
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();

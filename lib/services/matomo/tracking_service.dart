@@ -110,14 +110,39 @@ class TrackingService extends ChangeNotifier {
   // Track app open event
   void trackAppOpen(String uuid) {
     MatomoTracker.instance.trackEvent(
-      eventInfo: EventInfo(
-        category: 'usage',
-        action: 'App open',
-        name: uuid
-      ),
+      eventInfo: EventInfo(category: 'usage', action: 'App open', name: uuid),
     );
     if (kDebugMode) {
       print('App open tracked');
     }
+  }
+
+  Duration _accumulatedTime = Duration.zero;
+
+  void accumulateUsageTime(Duration duration) {
+    _accumulatedTime += duration;
+    if (kDebugMode) {
+      print(
+          "Accumulated app usage time: ${_accumulatedTime.inMilliseconds} ms");
+    }
+  }
+
+  void sendUsageData() {
+    final usageTimeInSeconds = _accumulatedTime.inSeconds;
+
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'usage',
+        action: 'how long app has been used on device',
+        name: 'Total Usage Time',
+        value: usageTimeInSeconds.toDouble(),
+      ),
+    );
+
+    if (kDebugMode) {
+      print('App usage time sent: $usageTimeInSeconds seconds');
+    }
+
+    _accumulatedTime = Duration.zero; // Reset after sending
   }
 }
