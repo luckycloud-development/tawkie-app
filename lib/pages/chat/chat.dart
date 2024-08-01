@@ -99,6 +99,8 @@ class ChatController extends State<ChatPageWithRoom>
     with WidgetsBindingObserver {
   Room get room => sendingClient.getRoomById(roomId) ?? widget.room;
 
+  late TrackingService trackingService;
+
   late Client sendingClient;
 
   Timeline? timeline;
@@ -268,6 +270,8 @@ class ChatController extends State<ChatPageWithRoom>
     inputFocus.addListener(_inputFocusListener);
 
     _loadDraft();
+
+    trackingService = Provider.of<TrackingService>(context, listen: false);
     super.initState();
     _displayChatDetailsColumn = ValueNotifier(
       Matrix.of(context).store.getBool(SettingKeys.displayChatDetailsColumn) ??
@@ -482,7 +486,7 @@ class ChatController extends State<ChatPageWithRoom>
       parseCommands: parseCommands,
     );
 
-    Provider.of<TrackingService>(context, listen: false).trackMessageSent();
+    trackingService.trackMessageSent();
 
     sendController.value = TextEditingValue(
       text: pendingText,
@@ -1129,6 +1133,8 @@ class ChatController extends State<ChatPageWithRoom>
       selectedEvents.sort(
         (a, b) => a.originServerTs.compareTo(b.originServerTs),
       );
+
+      trackingService.trackMessageLongPress();
     }
   }
 

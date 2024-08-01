@@ -223,4 +223,17 @@ class TrackingService extends ChangeNotifier {
       print('Message sent tracked in room');
     }
   }
+
+  void trackMessageLongPress() {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'messages',
+        action: 'long-press',
+      ),
+    );
+
+    if (kDebugMode) {
+      print('Message long-press tracked in room');
+    }
+  }
 }
