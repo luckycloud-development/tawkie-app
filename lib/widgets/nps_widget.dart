@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tawkie/services/matomo/tracking_service.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 class NPSWidget extends StatefulWidget {
   const NPSWidget({super.key});
@@ -18,7 +19,7 @@ class _NPSWidgetState extends State<NPSWidget> {
       trackingService.trackNPSScore(_selectedScore);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Merci pour votre feedback !")),
+        SnackBar(content: Text(L10n.of(context)!.npsResponse)),
       );
 
       Navigator.pop(context);
@@ -32,7 +33,7 @@ class _NPSWidgetState extends State<NPSWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Quelle est la probabilité que vous recommandiez notre application ?"),
+          Text(L10n.of(context)!.npsQuestion),
           const SizedBox(height: 10),
           Center(
             child: Wrap(
@@ -54,7 +55,7 @@ class _NPSWidgetState extends State<NPSWidget> {
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: _submitScore,
-            child: const Text("Soumettre"),
+            child: Text(L10n.of(context)!.submit),
           ),
         ],
       ),

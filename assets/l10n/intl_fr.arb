@@ -2499,5 +2499,7 @@
     "privacyTextPrivacy": "politiques de confidentialité",
     "privacyTextAnd": " et ",
     "privacyTextTerms": "conditions générales d’utilisation et de services",
-    "createGroupLimitationWarning": "Seul.es les utilisateur.ices Tawkie peuvent être rajouté.es aux groupes."
+    "createGroupLimitationWarning": "Seul.es les utilisateur.ices Tawkie peuvent être rajouté.es aux groupes.",
+    "npsQuestion": "Quelle est la probabilité que vous recommandiez notre application ?",
+    "npsResponse": "Merci pour votre feedback !"
 }
