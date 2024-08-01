@@ -46,6 +46,8 @@ void main() async {
   // Track app open event
   trackingService.trackAppOpen(userUUID!);
 
+  await trackingService.trackDeviceUsage();
+
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();
   }

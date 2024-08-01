@@ -1,5 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
+import 'package:tawkie/utils/platform_infos.dart';
+
+enum DeviceType {
+  android,
+  ios,
+  windows,
+  linux,
+  macos,
+  unknown,
+}
 
 class TrackingService extends ChangeNotifier {
   final Stopwatch _stopwatch = Stopwatch();
@@ -144,5 +154,60 @@ class TrackingService extends ChangeNotifier {
     }
 
     _accumulatedTime = Duration.zero; // Reset after sending
+  }
+
+  DeviceType getDeviceType() {
+    if (PlatformInfos.isAndroid) {
+      return DeviceType.android;
+    } else if (PlatformInfos.isIOS) {
+      return DeviceType.ios;
+    } else if (PlatformInfos.isWindows) {
+      return DeviceType.windows;
+    } else if (PlatformInfos.isLinux) {
+      return DeviceType.linux;
+    } else if (PlatformInfos.isMacOS) {
+      return DeviceType.macos;
+    } else {
+      return DeviceType.unknown;
+    }
+  }
+
+  Future<void> trackDeviceUsage() async {
+    DeviceType deviceType = getDeviceType();
+
+    String deviceName;
+    switch (deviceType) {
+      case DeviceType.android:
+        deviceName = 'Android';
+        break;
+      case DeviceType.ios:
+        deviceName = 'iOS';
+        break;
+      case DeviceType.windows:
+        deviceName = 'Windows';
+        break;
+      case DeviceType.linux:
+        deviceName = 'Linux';
+        break;
+      case DeviceType.macos:
+        deviceName = 'macOS';
+        break;
+      case DeviceType.unknown:
+      default:
+        deviceName = 'Unknown';
+        break;
+    }
+
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'usage',
+        action: 'device used',
+        name: deviceName,
+      ),
+    );
+
+    if (kDebugMode) {
+      print('Device used tracked: $deviceName');
+    }
   }
 }
