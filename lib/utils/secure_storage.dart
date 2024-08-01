@@ -24,4 +24,14 @@ class SecureStorageUtil {
   static Future<String?> getSessionToken() async {
     return await _secureStorage.read(key: 'sessionToken');
   }
+
+  static Future<void> storeUserUUID(String? userUUID) async {
+    if (userUUID != null) {
+      await _secureStorage.write(key: 'userUUID', value: userUUID);
+    }
+  }
+
+  static Future<String?> getUserUUID() async {
+    return await _secureStorage.read(key: 'userUUID');
+  }
 }
