@@ -17,6 +17,7 @@ import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,7 @@ import 'package:tawkie/pages/chat/chat_view.dart';
 import 'package:tawkie/pages/chat/event_info_dialog.dart';
 import 'package:tawkie/pages/chat/recording_dialog.dart';
 import 'package:tawkie/pages/chat_details/chat_details.dart';
+import 'package:tawkie/services/matomo/tracking_service.dart';
 import 'package:tawkie/utils/account_bundles.dart';
 import 'package:tawkie/utils/error_reporter.dart';
 import 'package:tawkie/utils/localized_exception_extension.dart';
@@ -479,6 +481,9 @@ class ChatController extends State<ChatPageWithRoom>
       editEventId: editEvent?.eventId,
       parseCommands: parseCommands,
     );
+
+    Provider.of<TrackingService>(context, listen: false).trackMessageSent();
+
     sendController.value = TextEditingValue(
       text: pendingText,
       selection: const TextSelection.collapsed(offset: 0),

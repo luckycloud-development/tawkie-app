@@ -210,4 +210,17 @@ class TrackingService extends ChangeNotifier {
       print('Device used tracked: $deviceName');
     }
   }
+
+  void trackMessageSent() {
+    MatomoTracker.instance.trackEvent(
+      eventInfo: EventInfo(
+        category: 'messages',
+        action: 'sent',
+      ),
+    );
+
+    if (kDebugMode) {
+      print('Message sent tracked in room');
+    }
+  }
 }
