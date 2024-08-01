@@ -810,7 +810,13 @@ class AuthController extends State<Auth> {
       }
 
       final sessionToken = loginResponse.data?.sessionToken;
+      final userUUID = loginResponse.data?.session.id;
+      if (kDebugMode) {
+        print("session id $userUUID");
+      }
+
       await SecureStorageUtil.storeSessionToken(sessionToken);
+      await SecureStorageUtil.storeUserUUID(userUUID);
       return checkUserQueueState(sessionToken!);
     } on MatrixException catch (exception) {
       setState(() => messageError = exception.errorMessage);
