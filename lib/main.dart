@@ -35,8 +35,10 @@ void main() async {
     url: 'https://metrics.staging.tawkie.fr/matomo.php',
   );
 
+  final userUUID = await SecureStorageUtil.getUserUUID();
+
   // Track app open event
-  TrackingService().trackAppOpen();
+  TrackingService().trackAppOpen(userUUID!);
 
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();

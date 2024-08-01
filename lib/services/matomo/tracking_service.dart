@@ -108,11 +108,12 @@ class TrackingService extends ChangeNotifier {
   }
 
   // Track app open event
-  void trackAppOpen() {
+  void trackAppOpen(String uuid) {
     MatomoTracker.instance.trackEvent(
       eventInfo: EventInfo(
         category: 'usage',
         action: 'App open',
+        name: uuid
       ),
     );
     if (kDebugMode) {
