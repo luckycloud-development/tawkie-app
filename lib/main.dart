@@ -44,7 +44,7 @@ void main() async {
   final userUUID = await SecureStorageUtil.getUserUUID();
 
   // Track app open event
-  trackingService.trackAppOpen(userUUID!);
+  if(userUUID != null) trackingService.trackAppOpen(userUUID);
 
   await trackingService.trackDeviceUsage();
 
