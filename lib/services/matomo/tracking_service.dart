@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
+import 'package:tawkie/services/nps_service.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 
 enum DeviceType {
@@ -316,27 +317,21 @@ class TrackingService extends ChangeNotifier {
     }
   }
 
-  void trackNPSScore(int score) {
-    String category;
-    if (score >= 8) {
-      category = 'Promoteur';
-    } else if (score >= 5) {
-      category = 'Passif';
-    } else {
-      category = 'Détracteur';
-    }
+  Future<void> trackNPSScore(int score) async {
+    final npsService = NPSService();
+    final uniqueDaysOpened = await npsService.getUniqueDaysOpened();
 
     MatomoTracker.instance.trackEvent(
       eventInfo: EventInfo(
         category: 'NPS',
-        action: 'NPS Score',
-        name: category,
+        action: 'User_Recommendation_Score',
+        name: uniqueDaysOpened.toString(),
         value: score.toDouble(),
       ),
     );
 
     if (kDebugMode) {
-      print('NPS score tracked: $score, category: $category');
+      print('NPS score tracked: $score in $uniqueDaysOpened');
     }
   }
 }

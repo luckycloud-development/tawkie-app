@@ -20,6 +20,11 @@ class NPSService {
     return jsonMap.map((key, value) => MapEntry(DateTime.parse(key), value));
   }
 
+  Future<int> getUniqueDaysOpened() async {
+    final appOpenings = await _getAppOpenings();
+    return appOpenings.keys.length; // The number of unique days
+  }
+
   Future<void> _setAppOpenings(Map<DateTime, int> appOpenings) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = json.encode(appOpenings.map((key, value) => MapEntry(key.toIso8601String(), value)));
