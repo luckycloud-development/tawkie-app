@@ -16,6 +16,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:tawkie/config/setting_keys.dart';
 import 'package:tawkie/pages/add_bridge/model/social_network.dart';
 import 'package:tawkie/pages/bootstrap/bootstrap_dialog.dart';
+import 'package:tawkie/pages/chat/send_file_dialog.dart';
 import 'package:tawkie/services/nps_service.dart';
 import 'package:tawkie/utils/account_bundles.dart';
 import 'package:tawkie/utils/matrix_sdk_extensions/matrix_file_extension.dart';

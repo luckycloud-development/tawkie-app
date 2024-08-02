@@ -79,6 +79,23 @@ abstract class AppConfig {
   static int requiredOpens = 1; // Number of openings required before showing NPS
   static int requiredDays = 1;  // Number of days of use required before showing NPS
 
+  // URLs for Beta Join
+  static const String testflightAppUrl = 'https://apps.apple.com/us/app/testflight/id899247664';
+  static const String appleBetaUrl = 'https://testflight.apple.com/join/daXe0NfW';
+  static const String playStoreUrl = 'https://play.google.com/store/apps/details?id=fr.tawkie.app';
+  static const String androidBetaUrl = 'https://play.google.com/apps/testing/fr.tawkie.app';
+
+  static const String iosUrl = 'itms-apps://itunes.apple.com/app/id899247664';
+  static const String androidUrl = 'market://details?id=fr.tawkie.app';
+
+  static const String prodBetaAlias = 'beta';
+  static const String testBetaAlias = 'testbeta';
+  static const String betaAlias = kDebugMode ? testBetaAlias : prodBetaAlias;
+  static const String serverStagingUrl = ':staging.tawkie.fr';
+  static const String serverProductionUrl = ':alpha.tawkie.fr';
+  static const String server = kDebugMode ? serverStagingUrl : serverProductionUrl;
+  static const String roomAlias = '#$betaAlias$server';
+
   static void loadFromJson(Map<String, dynamic> json) {
     if (json['chat_color'] != null) {
       try {
