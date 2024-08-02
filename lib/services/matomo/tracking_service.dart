@@ -318,7 +318,7 @@ class TrackingService extends ChangeNotifier {
 
   void trackNPSScore(int score) {
     String category;
-    if (score >= 7) {
+    if (score >= 8) {
       category = 'Promoteur';
     } else if (score >= 5) {
       category = 'Passif';
