@@ -39,92 +39,44 @@ class _NPSWidgetState extends State<NPSWidget> {
         children: [
           Text(
             L10n.of(context)!.npsQuestion,
+            textAlign: TextAlign.center,
             style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           Center(
-            child: Column(
-              children: [
-                Wrap(
-                  spacing: 8.0,
-                  alignment: WrapAlignment.center,
-                  children: List.generate(4, (index) {
-                    return ChoiceChip(
-                      label: Text('$index'),
-                      selected: _selectedScore == index,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          _selectedScore = index;
-                        });
-                      },
-                      selectedColor: primaryColor.withOpacity(0.2),
-                      backgroundColor: _selectedScore == index
-                          ? primaryColor
-                          : Colors.red,
-                      labelStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
-                      side: BorderSide(
-                        color: _selectedScore == index ? primaryColor : secondaryColor,
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  alignment: WrapAlignment.center,
-                  children: List.generate(3, (index) {
-                    final chipIndex = index + 4; // Index starts from 4 to 6
-                    return ChoiceChip(
-                      label: Text('$chipIndex'),
-                      selected: _selectedScore == chipIndex,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          _selectedScore = chipIndex;
-                        });
-                      },
-                      selectedColor: primaryColor.withOpacity(0.2),
-                      backgroundColor: _selectedScore == chipIndex
-                          ? primaryColor
-                          : Colors.orange,
-                      labelStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
-                      side: BorderSide(
-                        color: _selectedScore == chipIndex ? primaryColor : secondaryColor,
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  alignment: WrapAlignment.center,
-                  children: List.generate(4, (index) {
-                    final chipIndex = index + 7; // Index starts from 7 to 10
-                    return ChoiceChip(
-                      label: Text('$chipIndex'),
-                      selected: _selectedScore == chipIndex,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          _selectedScore = chipIndex;
-                        });
-                      },
-                      selectedColor: primaryColor.withOpacity(0.2),
-                      backgroundColor: _selectedScore == chipIndex
-                          ? primaryColor
-                          : Colors.green,
-                      labelStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
-                      side: BorderSide(
-                        color: _selectedScore == chipIndex ? primaryColor : secondaryColor,
-                      ),
-                    );
-                  }),
-                ),
-              ],
+            child: Wrap(
+              spacing: 8.0,
+              alignment: WrapAlignment.center,
+              children: List.generate(11, (index) {
+                Color backgroundColor;
+                if (index < 4) {
+                  backgroundColor = Colors.red;
+                } else if (index < 7) {
+                  backgroundColor = Colors.orange;
+                } else {
+                  backgroundColor = Colors.green;
+                }
+
+                return ChoiceChip(
+                  label: Text('$index'),
+                  selected: _selectedScore == index,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      _selectedScore = index;
+                    });
+                  },
+                  selectedColor: primaryColor.withOpacity(0.2),
+                  backgroundColor: _selectedScore == index
+                      ? primaryColor
+                      : backgroundColor,
+                  labelStyle: const TextStyle(
+                    color: Colors.white,
+                  ),
+                  side: BorderSide(
+                    color: _selectedScore == index ? primaryColor : secondaryColor,
+                  ),
+                );
+              }),
             ),
           ),
           const SizedBox(height: 10),
