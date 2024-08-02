@@ -1,15 +1,15 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
 import 'package:matrix/matrix.dart';
 import 'package:tawkie/utils/fluffy_share.dart';
-
+import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/avatar.dart';
 import 'package:tawkie/widgets/matrix.dart';
+
 import 'chat_list.dart';
 
 class ClientChooserButton extends StatelessWidget {
@@ -21,11 +21,11 @@ class ClientChooserButton extends StatelessWidget {
     final matrix = Matrix.of(context);
     final bundles = matrix.accountBundles.keys.toList()
       ..sort(
-        (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
+            (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
             ? 0
             : a.isValidMatrixId && !b.isValidMatrixId
-                ? -1
-                : 1,
+            ? -1
+            : 1,
       );
     return <PopupMenuEntry<Object>>[
       PopupMenuItem(
@@ -80,6 +80,18 @@ class ClientChooserButton extends StatelessWidget {
           ],
         ),
       ),
+      // Check if the device is mobile
+      if (PlatformInfos.isMobile)
+        PopupMenuItem(
+          value: SettingsAction.joinBeta,
+          child: Row(
+            children: [
+              const Icon(Icons.new_releases),
+              const SizedBox(width: 18),
+              Text(L10n.of(context)!.joinBetaTitle),
+            ],
+          ),
+        ),
       PopupMenuItem(
         value: SettingsAction.settings,
         child: Row(
@@ -191,7 +203,7 @@ class ClientChooserButton extends StatelessWidget {
         children: [
           ...List.generate(
             clientCount,
-            (index) => KeyBoardShortcuts(
+                (index) => KeyBoardShortcuts(
               keysToPress: _buildKeyboardShortcut(index + 1),
               helpLabel: L10n.of(context)!.switchToAccount(index + 1),
               onKeysPressed: () => _handleKeyboardShortcut(
@@ -232,7 +244,6 @@ class ClientChooserButton extends StatelessWidget {
                 name: snapshot.data?.displayName ??
                     matrix.client.userID!.localpart,
                 size: 32,
-                fontSize: 12,
               ),
             ),
           ),
@@ -253,9 +264,9 @@ class ClientChooserButton extends StatelessWidget {
   }
 
   void _clientSelected(
-    Object object,
-    BuildContext context,
-  ) async {
+      Object object,
+      BuildContext context,
+      ) async {
     if (object is Client) {
       controller.setActiveClient(object);
     } else if (object is String) {
@@ -288,7 +299,10 @@ class ClientChooserButton extends StatelessWidget {
         case SettingsAction.archive:
           context.go('/rooms/archive');
           break;
-        // Redirect to bot social network connection page
+        case SettingsAction.joinBeta:
+          context.go('/rooms/settings/joinBeta');
+          break;
+      // Redirect to bot social network connection page
         case SettingsAction.addBridgeBot:
           context.go('/rooms/settings/addbridgebot');
           break;
@@ -299,17 +313,17 @@ class ClientChooserButton extends StatelessWidget {
   }
 
   void _handleKeyboardShortcut(
-    MatrixState matrix,
-    int index,
-    BuildContext context,
-  ) {
+      MatrixState matrix,
+      int index,
+      BuildContext context,
+      ) {
     final bundles = matrix.accountBundles.keys.toList()
       ..sort(
-        (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
+            (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
             ? 0
             : a.isValidMatrixId && !b.isValidMatrixId
-                ? -1
-                : 1,
+            ? -1
+            : 1,
       );
     // beginning from end if negative
     if (index < 0) {
@@ -337,11 +351,11 @@ class ClientChooserButton extends StatelessWidget {
 
     final bundles = matrix.accountBundles.keys.toList()
       ..sort(
-        (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
+            (a, b) => a!.isValidMatrixId == b!.isValidMatrixId
             ? 0
             : a.isValidMatrixId && !b.isValidMatrixId
-                ? -1
-                : 1,
+            ? -1
+            : 1,
       );
     for (final bundleName in bundles) {
       final bundle = matrix.accountBundles[bundleName];
@@ -377,4 +391,5 @@ enum SettingsAction {
   invite,
   settings,
   archive,
+  joinBeta,
 }

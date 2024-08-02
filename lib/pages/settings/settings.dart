@@ -39,7 +39,6 @@ class SettingsController extends State<Settings> {
       useRootNavigator: false,
       context: context,
       title: L10n.of(context)!.editDisplayname,
-      message: L10n.of(context)!.editDisplaynameMessage,
       okLabel: L10n.of(context)!.ok,
       cancelLabel: L10n.of(context)!.cancel,
       textFields: [
@@ -216,8 +215,6 @@ class SettingsController extends State<Settings> {
     final client = Matrix.of(context).client;
     profileFuture ??= client.getProfileFromUserId(
       client.userID!,
-      cache: !profileUpdated,
-      getFromRooms: !profileUpdated,
     );
     return SettingsView(this);
   }
