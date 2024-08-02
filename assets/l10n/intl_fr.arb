@@ -2500,6 +2500,6 @@
     "privacyTextAnd": " et ",
     "privacyTextTerms": "conditions générales d’utilisation et de services",
     "createGroupLimitationWarning": "Seul.es les utilisateur.ices Tawkie peuvent être rajouté.es aux groupes.",
-    "npsQuestion": "Quelle est la probabilité que vous recommandiez notre application ?",
+    "npsQuestion": "[Sur une échelle de un à dix,] à quel point recommanderais-tu Tawkie à tes ami.es, tes collègues, ta famille ?",
     "npsResponse": "Merci pour votre feedback !"
 }

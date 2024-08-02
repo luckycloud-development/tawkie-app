@@ -2684,6 +2684,6 @@
   "privacyTextAnd": " and ",
   "privacyTextTerms": "terms of service",
   "createGroupLimitationWarning": "Only Tawkie / Matrix users can be added to a group chat.",
-  "npsQuestion": "How likely are you to recommend our application?",
+  "npsQuestion": "[On a scale of one to ten,] how likely would you be to recommend Tawkie to your friends, colleagues or family?",
   "npsResponse": "Thanks for your feedback!"
 }
