@@ -269,17 +269,17 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     }
     onRoomKeyRequestSub[name] ??=
         c.onRoomKeyRequest.stream.listen((RoomKeyRequest request) async {
-      if (widget.clients.any(
-        ((cl) =>
+          if (widget.clients.any(
+            ((cl) =>
             cl.userID == request.requestingDevice.userId &&
-            cl.identityKey == request.requestingDevice.curve25519Key),
-      )) {
-        Logs().i(
-          '[Key Request] Request is from one of our own clients, forwarding the key...',
-        );
-        await request.forwardKey();
-      }
-    });
+                cl.identityKey == request.requestingDevice.curve25519Key),
+          )) {
+            Logs().i(
+              '[Key Request] Request is from one of our own clients, forwarding the key...',
+            );
+            await request.forwardKey();
+          }
+        });
     onKeyVerificationRequestSub[name] ??= c.onKeyVerificationRequest.stream
         .listen((KeyVerification request) async {
       var hidPopup = false;
@@ -325,14 +325,33 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         onNotification[name] ??= c.onEvent.stream
             .where(
               (e) =>
-                  e.type == EventUpdateType.timeline &&
-                  [EventTypes.Message, EventTypes.Sticker, EventTypes.Encrypted]
-                      .contains(e.content['type']) &&
-                  e.content['sender'] != c.userID,
-            )
-            .listen(showLocalNotification);
+          e.type == EventUpdateType.timeline &&
+              (e.content['type'] == EventTypes.Message ||
+                  e.content['type'] == 'm.reaction') &&
+              e.content['sender'] != c.userID,
+        )
+            .listen((event) {
+          // Code to bring the conversation to the top
+          _bringConversationToTop(event.roomID);
+
+          // Also show the local notification
+          showLocalNotification(event);
+        });
       });
     }
+  }
+
+  void _bringConversationToTop(String roomId) {
+    // Implement the logic to move the conversation with roomId to the top of the list
+    // This could involve updating the state of a list or notifying the UI to rebuild.
+    setState(() {
+      // Example logic assuming you have a list of rooms stored in a state variable
+      final roomIndex = widget.clients[_activeClient].rooms.indexWhere((r) => r.id == roomId);
+      if (roomIndex != -1) {
+        final room = widget.clients[_activeClient].rooms.removeAt(roomIndex);
+        widget.clients[_activeClient].rooms.insert(0, room);
+      }
+    });
   }
 
   void _cancelSubs(String name) {
