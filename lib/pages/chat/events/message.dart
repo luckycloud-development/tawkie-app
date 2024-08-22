@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:tawkie/config/app_config.dart';
-
 import 'package:tawkie/config/themes.dart';
 import 'package:tawkie/pages/chat/events/message_reactions.dart';
 import 'package:tawkie/utils/date_time_extension.dart';
 import 'package:tawkie/utils/string_color.dart';
 import 'package:tawkie/widgets/avatar.dart';
 import 'package:tawkie/widgets/matrix.dart';
+
+import 'message_group_content.dart';
 import 'message_content.dart';
 import 'reply_content.dart';
 import 'state_message.dart';
@@ -142,6 +142,42 @@ class Message extends StatelessWidget {
 
     final resetAnimateIn = this.resetAnimateIn;
     var animateIn = this.animateIn;
+
+    // Message grouping section
+    // (if messages have the same originServerTs)
+    bool hasSameTimestamp(Event? event, Event? nextEvent) {
+      if (event == null || nextEvent == null) {
+        return false;
+      }
+      return event.originServerTs == nextEvent.originServerTs;
+    }
+
+    List<Event> groupEvents() {
+      return [event, nextEvent].where((e) => e != null).cast<Event>().toList();
+    }
+
+    bool canGroupEvents() {
+      return hasSameTimestamp(event, nextEvent);
+    }
+
+    bool hasSamePreviousTimestamp(Event? currentEvent, Event? previousEvent) {
+      if (currentEvent == null || previousEvent == null) {
+        return false;
+      }
+      return currentEvent.originServerTs == previousEvent.originServerTs;
+    }
+
+    bool isDuplicateEvent() {
+      return hasSamePreviousTimestamp(event, previousEvent);
+    }
+
+    final isHidden = isDuplicateEvent();
+
+    if (isHidden) {
+      return const SizedBox.shrink();
+    }
+
+    final List<Event> groupedEvents = canGroupEvents() ? groupEvents() : [];
 
     final row = StatefulBuilder(
       builder: (context, setState) {
@@ -374,12 +410,19 @@ class Message extends StatelessWidget {
                                                   );
                                                 },
                                               ),
-                                            MessageContent(
-                                              displayEvent,
-                                              textColor: textColor,
-                                              onInfoTab: onInfoTab,
-                                              borderRadius: borderRadius,
-                                            ),
+                                            groupedEvents.isNotEmpty
+                                                ? MessageGroupContent(
+                                                    groupedEvents,
+                                                    textColor: textColor,
+                                                    onInfoTab: onInfoTab,
+                                                    borderRadius: borderRadius,
+                                                  )
+                                                : MessageContent(
+                                                    displayEvent,
+                                                    textColor: textColor,
+                                                    onInfoTab: onInfoTab,
+                                                    borderRadius: borderRadius,
+                                                  ),
                                             if (event.hasAggregatedEvents(
                                               timeline,
                                               RelationshipTypes.edit,
