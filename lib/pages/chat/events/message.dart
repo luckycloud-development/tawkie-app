@@ -170,7 +170,6 @@ class Message extends StatelessWidget {
 
     List<Event> groupEvents() {
       List<Event> possibleGroup = [event, nextEvent].where((e) => e != null).cast<Event>().toList();
-      
       if (containsMediaAndText(possibleGroup)) {
         return possibleGroup;
       }
@@ -201,6 +200,17 @@ class Message extends StatelessWidget {
     }
 
     final List<Event> groupedEvents = canGroupEvents() ? groupEvents() : [];
+
+    Event getEventForReactions(List<Event> groupedEvents) {
+      for (var event in groupedEvents) {
+        if (isMediaEvent(event)) {
+          return event;
+        }
+      }
+      return groupedEvents.isNotEmpty ? groupedEvents.last : event;
+    }
+
+    final Event eventForReactions = getEventForReactions(groupedEvents);
 
     final row = StatefulBuilder(
       builder: (context, setState) {
@@ -536,7 +546,7 @@ class Message extends StatelessWidget {
                 left: (ownMessage ? 0 : Avatar.defaultSize) + 12.0,
                 right: 12.0,
               ),
-              child: MessageReactions(event, timeline),
+              child: MessageReactions(groupedEvents.isNotEmpty ?eventForReactions :event, timeline),
             ),
           if (displayReadMarker)
             Row(
