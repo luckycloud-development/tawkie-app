@@ -152,13 +152,36 @@ class Message extends StatelessWidget {
       return event.originServerTs == nextEvent.originServerTs;
     }
 
+    bool isMediaEvent(Event event) {
+      return event.messageType == MessageTypes.Image ||
+          event.messageType == MessageTypes.Video ||
+          event.messageType == MessageTypes.Sticker;
+    }
+
+    bool isTextEvent(Event event) {
+      return event.messageType == MessageTypes.Text || event.messageType == MessageTypes.Notice;
+    }
+
+    bool containsMediaAndText(List<Event> events) {
+      bool hasMedia = events.any((event) => isMediaEvent(event));
+      bool hasText = events.any((event) => isTextEvent(event));
+      return hasMedia && hasText;
+    }
+
     List<Event> groupEvents() {
-      return [event, nextEvent].where((e) => e != null).cast<Event>().toList();
+      List<Event> possibleGroup = [event, nextEvent].where((e) => e != null).cast<Event>().toList();
+      
+      if (containsMediaAndText(possibleGroup)) {
+        return possibleGroup;
+      }
+
+      return [];
     }
 
     bool canGroupEvents() {
-      return hasSameTimestamp(event, nextEvent);
+      return hasSameTimestamp(event, nextEvent) && containsMediaAndText([event, nextEvent!]);
     }
+
 
     bool hasSamePreviousTimestamp(Event? currentEvent, Event? previousEvent) {
       if (currentEvent == null || previousEvent == null) {
