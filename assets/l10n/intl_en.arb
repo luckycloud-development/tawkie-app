@@ -2901,5 +2901,6 @@
   "leaveTheConvDesc": "Do you really want to leave this conversation?",
   "leaveTheConvSuccess": "You have left the conversation.",
   "chatBotRoomsTitle": "Bots conversations",
-  "chatBotRoomsNotFound": "No conversation with bots."
+  "chatBotRoomsNotFound": "No conversation with bots.",
+  "ticketsTitlePage": "Bug reports"
 }

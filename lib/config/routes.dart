@@ -33,6 +33,7 @@ import 'package:tawkie/pages/settings_password/settings_password.dart';
 import 'package:tawkie/pages/settings_security/settings_security.dart';
 import 'package:tawkie/pages/settings_style/settings_style.dart';
 import 'package:tawkie/pages/sub/sub_body.dart';
+import 'package:tawkie/pages/tickets/tickets_page.dart';
 import 'package:tawkie/pages/welcome_slides/slides.dart';
 import 'package:tawkie/widgets/layouts/empty_page.dart';
 import 'package:tawkie/widgets/layouts/two_column_layout.dart';
@@ -311,6 +312,15 @@ abstract class AppRoutes {
                         context,
                         state,
                         const BetaJoinPage(),
+                      ),
+                      redirect: loggedOutRedirect,
+                    ),
+                    GoRoute(
+                      path: 'tickets',
+                      pageBuilder: (context, state) => defaultPageBuilder(
+                        context,
+                        state,
+                        TicketsPage(),
                       ),
                       redirect: loggedOutRedirect,
                     ),
