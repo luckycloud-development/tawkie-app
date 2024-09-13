@@ -12,7 +12,6 @@ class TicketsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final tickets = controller.tickets;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       body: Stack(
         children: [
           // Main content (Ticket List)
@@ -75,7 +74,7 @@ class TicketsPage extends StatelessWidget {
                                 size: 30, color: Colors.white),
                             SizedBox(width: 5),
                             Text(
-                              '15',
+                              tickets.length.toString(),
                               style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,
