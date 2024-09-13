@@ -100,6 +100,18 @@ class TicketsController extends State<Tickets> {
         },
       );
 
+      final newTicket = Ticket(
+        version: version,
+        platform: platform,
+        content: userMessage,
+        date: DateTime.now(),
+        roomId: roomId,
+      );
+
+      setState(() {
+        tickets.add(newTicket);
+      });
+
       print("Message envoyé dans la room $roomId.");
     } catch (e) {
       print("Erreur lors de l'envoi du message dans la room $roomId: $e");

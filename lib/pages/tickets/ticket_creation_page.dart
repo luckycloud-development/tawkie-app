@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:future_loading_dialog/future_loading_dialog.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
 
 class TicketCreationPage extends StatefulWidget {
@@ -41,10 +43,14 @@ class _TicketCreationPageState extends State<TicketCreationPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  widget.controller.openNewTicket(
-                    userMessage: _descriptionController.text,
-                  );
+                onPressed: () async {
+                  await showFutureLoadingDialog(
+                      context: context,
+                      future: () => widget.controller.openNewTicket(
+                            userMessage: _descriptionController.text,
+                          ));
+
+                  context.pop();
                 },
                 child: Text('Envoyer'),
               ),
