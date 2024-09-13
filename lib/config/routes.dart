@@ -33,6 +33,7 @@ import 'package:tawkie/pages/settings_password/settings_password.dart';
 import 'package:tawkie/pages/settings_security/settings_security.dart';
 import 'package:tawkie/pages/settings_style/settings_style.dart';
 import 'package:tawkie/pages/sub/sub_body.dart';
+import 'package:tawkie/pages/tickets/ticket_creation_page.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
 import 'package:tawkie/pages/welcome_slides/slides.dart';
 import 'package:tawkie/widgets/layouts/empty_page.dart';
@@ -323,6 +324,19 @@ abstract class AppRoutes {
                         Tickets(),
                       ),
                       redirect: loggedOutRedirect,
+                      routes: [
+                        GoRoute(
+                          path: 'new',
+                          pageBuilder: (context, state) => defaultPageBuilder(
+                            context,
+                            state,
+                            TicketCreationPage(
+                              controller: state.extra as TicketsController,
+                            ),
+                          ),
+                          redirect: loggedOutRedirect,
+                        ),
+                      ],
                     ),
                     // Route to social networking page via chat bot
                     // The entire path is: /rooms/settings/addbridgebot

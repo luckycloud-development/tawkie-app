@@ -1,50 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tawkie/config/app_config.dart';
+import 'package:tawkie/pages/tickets/tickets.dart';
 
 class TicketsPage extends StatelessWidget {
-  final List<Map<String, String>> tickets = [
-    {
-      "title": "Messenger problem",
-      "user": "John",
-      "date": "12 sept 202",
-      "status": "OPEN"
-    },
-    {
-      "title": "Subscription page bug",
-      "user": "Cindy",
-      "date": "9 sept 202",
-      "status": "OPEN"
-    },
-    {
-      "title": "Color theme",
-      "user": "Estelle",
-      "date": "9 sept 202",
-      "status": "OPEN"
-    },
-    {
-      "title": "Questions on WhatsApp",
-      "user": "Henry",
-      "date": "8 sept 202",
-      "status": "OPEN"
-    },
-    {
-      "title": "Suggested improvement",
-      "user": "Paul",
-      "date": "5 sept 202",
-      "status": "OPEN"
-    },
-    {
-      "title": "First bug report",
-      "user": "Alexandre",
-      "date": "5 sept 202",
-      "status": "OPEN"
-    },
-  ];
+  final TicketsController controller;
 
-  TicketsPage({super.key});
+  const TicketsPage({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final tickets = controller.tickets;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       body: Stack(
@@ -63,10 +29,10 @@ class TicketsPage extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5.0),
                         child: TicketTile(
-                          title: ticket["title"]!,
-                          user: ticket["user"]!,
-                          date: ticket["date"]!,
-                          status: ticket["status"]!,
+                          title: ticket.content,
+                          user: ticket.platform,
+                          date: ticket.date.toString(),
+                          status: 'open',
                         ),
                       );
                     },
@@ -148,7 +114,12 @@ class TicketsPage extends StatelessWidget {
             left: MediaQuery.of(context).size.width *
                 0.3, // Centered horizontally
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.push(
+                  '/rooms/settings/tickets/new',
+                  extra: controller,
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConfig.primaryColorLight,
                 shape: RoundedRectangleBorder(
