@@ -22,7 +22,14 @@ class TicketsController extends State<Tickets> {
   @override
   void initState() {
     super.initState();
-    _getRoomsForUser();
+    _initializeTickets();
+  }
+
+  Future<void> _initializeTickets() async {
+    await _getRoomsForUser();
+    for (var room in filteredRooms) {
+      await getTicketsFromRoom(room);
+    }
   }
 
   // Method to recover and filter rooms
@@ -120,32 +127,52 @@ class TicketsController extends State<Tickets> {
         userMessage: userMessage,
       );
     } else {
-      print("Impossible de créer une nouvelle conversation.");
+      print("Impossible to create a new conversation.");
     }
   }
 
-
   Future<void> getTicketsFromRoom(Room room) async {
     try {
+      if (tickets.any((ticket) => ticket.roomId == room.id)) {
+        if (kDebugMode) {
+          print('Tickets for this room have already been collected: ${room.id}');
+        }
+        return;
+      }
+
       final eventsResponse = await Matrix.of(context).client.getRoomEvents(
             room.id,
             Direction.b,
             limit: 50,
           );
 
-      // Browse events and turn them into Tickets
-      List<Ticket> newTickets = eventsResponse.chunk.map((event) {
-        String content = event.content['body'].toString();
-        DateTime date = event.originServerTs;
-        return Ticket.fromRoomMessage(content, date);
-      }).toList();
+      List<Ticket> newTickets = eventsResponse.chunk
+          .map((event) {
+            Map<String, Object?> content = event.content;
+
+            String? messageBody = content['body'] as String?;
+            if (messageBody != null) {
+              print("Text message: $messageBody");
+            } else {
+              print("No text found in the message");
+              return null;
+            }
+
+            DateTime date = event.originServerTs;
+
+            // Create a ticket from the message and add the room id to avoid duplicates
+            return Ticket.fromRoomMessage(messageBody, date)..roomId = room.id;
+          })
+          .where((ticket) => ticket != null)
+          .cast<Ticket>()
+          .toList();
 
       setState(() {
+        // Add new tickets without duplicates
         tickets.addAll(newTickets);
       });
     } catch (e) {
-      print(
-          'Erreur lors de la récupération des événements pour la salle ${room.id}: $e');
+      print('Error retrieving events for room ${room.id}: $e');
     }
   }
 
