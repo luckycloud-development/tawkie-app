@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:tawkie/pages/tickets/tickets_page.dart';
+import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/matrix.dart';
 
 import 'model/ticket_model.dart';
@@ -99,11 +101,17 @@ class TicketsController extends State<Tickets> {
 
   // Function to open a new ticket
   Future<void> openNewTicket({
-    required String version,
-    required String platform,
     required String userMessage,
   }) async {
+    String platform = PlatformInfos.getPlatform();
+    String version = await PlatformInfos.getVersion();
     String? roomId = await createNewDirectChatWithUser(userId);
+
+    if (kDebugMode) {
+      print('platform: $platform');
+      print('version: $version');
+    }
+
     if (roomId != null) {
       await sendMessageToRoom(
         roomId: roomId,
@@ -115,6 +123,7 @@ class TicketsController extends State<Tickets> {
       print("Impossible de créer une nouvelle conversation.");
     }
   }
+
 
   Future<void> getTicketsFromRoom(Room room) async {
     try {

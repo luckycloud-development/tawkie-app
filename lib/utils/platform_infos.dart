@@ -40,6 +40,24 @@ abstract class PlatformInfos {
     }
   }
 
+  static String getPlatform() {
+    if (PlatformInfos.isIOS) {
+      return 'iOS';
+    } else if (PlatformInfos.isAndroid) {
+      return 'Android';
+    } else if (PlatformInfos.isWeb) {
+      return 'Web';
+    } else if (PlatformInfos.isLinux) {
+      return 'Linux';
+    } else if (PlatformInfos.isWindows) {
+      return 'Windows';
+    } else if (PlatformInfos.isMacOS) {
+      return 'MacOS';
+    } else {
+      return 'Unknown';
+    }
+  }
+
   static Future<String> getVersion() async {
     var version = kIsWeb ? 'Web' : 'Unknown';
     try {
