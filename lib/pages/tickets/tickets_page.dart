@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
 import 'package:tawkie/utils/platform_infos.dart';
@@ -33,7 +34,7 @@ class TicketsPage extends StatelessWidget {
                               child: TicketTile(
                                 title: ticket.content,
                                 platForm: ticket.platform,
-                                date: ticket.date.toString(),
+                                date: ticket.date,
                                 status: 'open',
                               ),
                             );
@@ -161,7 +162,7 @@ class TicketsPage extends StatelessWidget {
 class TicketTile extends StatelessWidget {
   final String title;
   final String platForm;
-  final String date;
+  final DateTime date;
   final String status;
 
   const TicketTile(
@@ -175,6 +176,9 @@ class TicketTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     final isDarkMode = brightness == Brightness.dark;
+
+    String formattedDate = DateFormat('dd/MM/yyyy').format(date);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2.0),
       // Space between the tiles
@@ -242,9 +246,10 @@ class TicketTile extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4), // Spacing between the badge and the date
-            Text(date,
-                style:
-                    TextStyle(color: isDarkMode ? Colors.black : Colors.grey)),
+            Text(
+              formattedDate,
+              style: TextStyle(color: isDarkMode ? Colors.black : Colors.grey),
+            ),
           ],
         ),
       ),
