@@ -18,6 +18,7 @@ class TicketsController extends State<Tickets> {
   String userId = '@honoroit:alpha.tawkie.fr';
   List<Room> filteredRooms = [];
   List<Ticket> tickets = [];
+  List<Ticket> filteredTickets = [];
   bool loading = true;
 
   @override
@@ -34,6 +35,21 @@ class TicketsController extends State<Tickets> {
 
     setState(() {
       loading = false;
+      filteredTickets = tickets;
+    });
+  }
+
+  // Filter tickets by search text
+  void filterTickets(String searchText) {
+    setState(() {
+      if (searchText.isEmpty) {
+        filteredTickets = tickets;
+      } else {
+        filteredTickets = tickets
+            .where((ticket) =>
+            ticket.content.toLowerCase().contains(searchText.toLowerCase()))
+            .toList();
+      }
     });
   }
 

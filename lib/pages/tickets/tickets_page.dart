@@ -12,7 +12,7 @@ class TicketsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tickets = controller.tickets;
+    final tickets = controller.filteredTickets;
     return Scaffold(
       body: Stack(
         children: [
@@ -22,7 +22,7 @@ class TicketsPage extends StatelessWidget {
             // Adjusting for space with AppBar
             child: Column(
               children: [
-                controller.tickets.isNotEmpty
+                tickets.isNotEmpty
                     ? Expanded(
                         child: ListView.builder(
                           itemCount: tickets.length,
@@ -114,6 +114,10 @@ class TicketsPage extends StatelessWidget {
                         filled: true,
                         fillColor: Colors.white,
                       ),
+                      style: const TextStyle(color: Colors.black),
+                      onChanged: (value) {
+                        controller.filterTickets(value);
+                      },
                     ),
                   ),
                 ],
