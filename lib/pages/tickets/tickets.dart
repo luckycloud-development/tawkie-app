@@ -67,9 +67,7 @@ class TicketsController extends State<Tickets> {
 
   // Method to recover and filter rooms
   Future<void> _getRoomsForUser() async {
-    List<Room> allRooms = Matrix.of(context).client.rooms;
-
-    List<Room> filteredRooms = getRoomsWithUser(allRooms, userId);
+    List<Room> filteredRooms = await getTicketRooms();
 
     if (mounted) {
       setState(() {
@@ -83,12 +81,50 @@ class TicketsController extends State<Tickets> {
     }
   }
 
+  Future<void> _checkRoomParticipants(Room room) async {
+    // Vérifie le nombre de participants pour déterminer le statut du ticket
+    List<User> participants = room.getParticipants();
+    String status = (participants.length == 2) ? 'open' : 'closed';
+
+    // Mets à jour le statut des tickets de cette room
+    for (var ticket in tickets) {
+      if (ticket.roomId == room.id) {
+        setState(() {
+          ticket.status = status;
+        });
+      }
+    }
+
+    if (kDebugMode) {
+      print("Room ${room.id} status checked: $status");
+    }
+  }
+
   // Function to obtain rooms where a specific user is present
-  List<Room> getRoomsWithUser(List<Room> rooms, String userId) {
-    return rooms.where((room) {
-      List<User> participants = room.getParticipants();
-      return participants.any((user) => user.id == userId);
-    }).toList();
+  Future<List<Room>> getTicketRooms() async {
+    List<Room> allRooms = Matrix.of(context).client.rooms;
+    List<Room> ticketRooms = [];
+
+    // Parcourir toutes les salles et vérifier si elles contiennent un état m.room.tawkie.ticket
+    for (var room in allRooms) {
+      try {
+        final stateEvent = await Matrix.of(context).client.getRoomStateWithKey(
+              room.id,
+              'm.room.tawkie.ticket',
+              // Type d'événement personnalisé pour les tickets
+              '', // Clé d'état vide car on n'a qu'une instance pour ce type
+            );
+
+        // Si un tel événement existe, c'est un ticket
+        ticketRooms.add(room);
+      } catch (e) {
+        if (kDebugMode) {
+          print('No ticket metadata found for room ${room.id}: $e');
+        }
+      }
+    }
+
+    return ticketRooms; // Retourne les salles marquées comme des tickets
   }
 
   // Function to create a new direct chat with a user (forces creation of a new room)
@@ -138,12 +174,12 @@ class TicketsController extends State<Tickets> {
       );
 
       final newTicket = Ticket(
-        version: version,
-        platform: platform,
-        content: userMessage,
-        date: DateTime.now(),
-        roomId: roomId,
-      );
+          version: version,
+          platform: platform,
+          content: userMessage,
+          date: DateTime.now(),
+          roomId: roomId,
+          status: "open");
 
       setState(() {
         tickets.add(newTicket);
@@ -187,6 +223,27 @@ class TicketsController extends State<Tickets> {
     }
   }
 
+  Future<void> setTicketMetadata(String roomId) async {
+    try {
+      await Matrix.of(context).client.setRoomStateWithKey(
+        roomId,
+        'm.room.tawkie.ticket',
+        // Type d'événement personnalisé pour les tickets
+        '', // Clé d'état (peut être vide si une seule instance)
+        {
+          'created_at': DateTime.now().toIso8601String(),
+        },
+      );
+      if (kDebugMode) {
+        print("Ticket metadata set in room $roomId.");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error setting ticket metadata for room $roomId: $e");
+      }
+    }
+  }
+
   // Function to open a new ticket
   Future<void> openNewTicket({
     required String userMessage,
@@ -210,6 +267,9 @@ class TicketsController extends State<Tickets> {
           platform: platform,
           userMessage: userMessage,
         );
+
+        // Marking the room as a ticket
+        await setTicketMetadata(roomId);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -225,6 +285,7 @@ class TicketsController extends State<Tickets> {
           print(
               'Tickets for this room have already been collected: ${room.id}');
         }
+        await _checkRoomParticipants(room);
         return;
       }
 
@@ -246,6 +307,12 @@ class TicketsController extends State<Tickets> {
           break; // No more messages to fetch
         }
 
+        // Check number of participants to determine ticket status
+        List<User> participants = room.getParticipants();
+        String status = (participants.length == 2) ? 'open' : 'closed';
+
+        print("status: ${participants.length}");
+
         // Process the messages and attempt to extract tickets
         List<Ticket> newTickets = eventsResponse.chunk
             .map((event) {
@@ -260,7 +327,7 @@ class TicketsController extends State<Tickets> {
                   DateTime date = event.originServerTs;
 
                   // Try to create a ticket from the message
-                  return Ticket.fromRoomMessage(messageBody, date)
+                  return Ticket.fromRoomMessage(messageBody, date, status)
                     ..roomId = room.id;
                 } catch (e) {
                   // Handle invalid message formats without stopping the process

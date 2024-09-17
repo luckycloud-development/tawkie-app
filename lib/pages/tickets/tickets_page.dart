@@ -38,7 +38,7 @@ class TicketsPage extends StatelessWidget {
                                 title: ticket.content,
                                 platForm: ticket.platform,
                                 date: ticket.date,
-                                status: 'open',
+                                status: ticket.status,
                               ),
                             );
                           },

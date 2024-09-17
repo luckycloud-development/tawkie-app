@@ -4,6 +4,7 @@ class Ticket {
   final String content;
   final DateTime date;
   String? roomId;
+  String status; // Ajouter le status
 
   Ticket({
     required this.version,
@@ -11,13 +12,14 @@ class Ticket {
     required this.content,
     required this.date,
     this.roomId,
+    required this.status, // Le statut est maintenant obligatoire
   });
 
-  factory Ticket.fromRoomMessage(String message, DateTime date) {
+  factory Ticket.fromRoomMessage(String message, DateTime date, String status) {
     final versionRegExp = RegExp(r'\*\*Version\*\*: ([^\n]+)');
     final platformRegExp = RegExp(r'\*\*Plateforme\*\*: ([^\n]+)');
     final contentRegExp =
-        RegExp(r"\*\*Message de l'utilisateur\*\*: ?([\s\S]*)");
+    RegExp(r"\*\*Message de l'utilisateur\*\*: ?([\s\S]*)");
 
     final versionMatch = versionRegExp.firstMatch(message);
     final platformMatch = platformRegExp.firstMatch(message);
@@ -29,6 +31,7 @@ class Ticket {
         platform: platformMatch.group(1) ?? '',
         content: contentMatch.group(1)?.trim() ?? '',
         date: date,
+        status: status,
       );
     } else {
       throw FormatException("Message format is invalid");
