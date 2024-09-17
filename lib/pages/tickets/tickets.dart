@@ -60,7 +60,7 @@ class TicketsController extends State<Tickets> {
   // Function to create a new direct chat with a user (forces creation of a new room)
   Future<String?> createNewDirectChatWithUser(String userId) async {
     try {
-      // Créer une nouvelle room spécifiquement pour cet utilisateur
+      // Create a new room specifically for this user
       String roomId = await Matrix.of(context).client.createRoom(
             isDirect: true,
             invite: [userId],
@@ -68,8 +68,9 @@ class TicketsController extends State<Tickets> {
           );
       return roomId;
     } catch (e) {
-      print(
-          "Erreur lors de la création d'une nouvelle room avec l'utilisateur $userId: $e");
+      if (kDebugMode) {
+        print("Error when creating a new room with the user $userId: $e");
+      }
       return null;
     }
   }
@@ -117,9 +118,13 @@ class TicketsController extends State<Tickets> {
         loading = false;
       });
 
-      print("Message envoyé dans la room $roomId.");
+      if (kDebugMode) {
+        print("Message sent in the room $roomId.");
+      }
     } catch (e) {
-      print("Erreur lors de l'envoi du message dans la room $roomId: $e");
+      if (kDebugMode) {
+        print("Error sending message to room $roomId: $e");
+      }
     }
   }
 
@@ -144,7 +149,9 @@ class TicketsController extends State<Tickets> {
         userMessage: userMessage,
       );
     } else {
-      print("Impossible to create a new conversation.");
+      if (kDebugMode) {
+        print("Impossible to create a new conversation.");
+      }
     }
   }
 
@@ -170,9 +177,13 @@ class TicketsController extends State<Tickets> {
 
             String? messageBody = content['body'] as String?;
             if (messageBody != null) {
-              print("Text message: $messageBody");
+              if (kDebugMode) {
+                print("Text message: $messageBody");
+              }
             } else {
-              print("No text found in the message");
+              if (kDebugMode) {
+                print("No text found in the message");
+              }
               return null;
             }
 
@@ -194,7 +205,9 @@ class TicketsController extends State<Tickets> {
         loading = false;
       });
     } catch (e) {
-      print('Error retrieving events for room ${room.id}: $e');
+      if (kDebugMode) {
+        print('Error retrieving events for room ${room.id}: $e');
+      }
     }
   }
 
