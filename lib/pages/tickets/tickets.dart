@@ -160,6 +160,33 @@ class TicketsController extends State<Tickets> {
     }
   }
 
+  // Wait for the bot to accept the conversation before sending a message
+  Future<void> waitForBotToJoinRoom(String roomId, String botUserId,
+      {Duration timeout = const Duration(seconds: 10)}) async {
+    final startTime = DateTime.now();
+    bool botJoined = false;
+
+    while (!botJoined) {
+      if (DateTime.now().difference(startTime) > timeout) {
+        throw Exception(
+            "The bot did not join the room within the allotted time.");
+      }
+
+      Room? room = Matrix.of(context).client.getRoomById(roomId);
+      if (room == null) {
+        throw Exception("Room not found : $roomId");
+      }
+
+      // Check if the bot is in the list of participants
+      List<User> participants = room.getParticipants();
+      botJoined = participants.any((user) => user.id == botUserId);
+
+      if (!botJoined) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+  }
+
   // Function to open a new ticket
   Future<void> openNewTicket({
     required String userMessage,
@@ -173,16 +200,20 @@ class TicketsController extends State<Tickets> {
       print('version: $version');
     }
 
-    if (roomId != null) {
-      await sendMessageToRoom(
-        roomId: roomId,
-        version: version,
-        platform: platform,
-        userMessage: userMessage,
-      );
-    } else {
+    try {
+      if (roomId != null) {
+        await waitForBotToJoinRoom(roomId, userId);
+
+        await sendMessageToRoom(
+          roomId: roomId,
+          version: version,
+          platform: platform,
+          userMessage: userMessage,
+        );
+      }
+    } catch (e) {
       if (kDebugMode) {
-        print("Impossible to create a new conversation.");
+        print("Impossible to create a new conversation: $e");
       }
     }
   }
