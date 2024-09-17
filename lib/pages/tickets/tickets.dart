@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
+import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets_page.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/matrix.dart';
@@ -15,7 +16,7 @@ class Tickets extends StatefulWidget {
 }
 
 class TicketsController extends State<Tickets> {
-  String userId = '@honoroit:alpha.tawkie.fr';
+  String userId = AppConfig.ticketsBotId;
   List<Room> filteredRooms = [];
   List<Ticket> tickets = [];
   List<Ticket> filteredTickets = [];
