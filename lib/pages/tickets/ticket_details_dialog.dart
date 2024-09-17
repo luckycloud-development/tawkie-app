@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tawkie/widgets/platform_avatar.dart';
+import 'package:tawkie/widgets/ticket_status_badge.dart';
 
 class TicketDetailDialog extends StatelessWidget {
   final String title;
@@ -52,22 +53,7 @@ class TicketDetailDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        status,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
+                    TicketStatusBadge(status: status),
                   ],
                 ),
                 const SizedBox(height: 20),

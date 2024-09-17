@@ -6,6 +6,7 @@ import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/ticket_details_dialog.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
 import 'package:tawkie/widgets/platform_avatar.dart';
+import 'package:tawkie/widgets/ticket_status_badge.dart';
 
 class TicketsPage extends StatelessWidget {
   final TicketsController controller;
@@ -228,23 +229,7 @@ class TicketTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Badge for status
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              // Padding inside the badge
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius:
-                    BorderRadius.circular(20), // Rounded corners for the badge
-              ),
-              child: Text(
-                status,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+            TicketStatusBadge(status: status),
             const SizedBox(height: 4),
             Text(
               formattedDate,
