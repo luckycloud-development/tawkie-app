@@ -109,29 +109,34 @@ class TicketsPage extends StatelessWidget {
 
           // Floating Open Tickets Button (placed to overlap the AppBar)
           Positioned(
-            top: 155,
-            left: MediaQuery.of(context).size.width *
-                0.3, // Centered horizontally
-            child: ElevatedButton(
-              onPressed: () {
-                context.push(
-                  '/rooms/settings/tickets/new',
-                  extra: controller,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppConfig.primaryColorLight,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-              ),
-              child: Text('Open Tikets',
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)),
+            top: 155, // Centered horizontally
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    context.push(
+                      '/rooms/settings/tickets/new',
+                      extra: controller,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConfig.primaryColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 32),
+                  ),
+                  child: Text('Open Tikets',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold)),
+                )
+              ],
             ),
           ),
         ],
