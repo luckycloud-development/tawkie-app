@@ -256,7 +256,8 @@ class TicketTile extends StatelessWidget {
       MaterialPageRoute(
           builder: (context) => ChatPage(
                 roomId: roomId,
-              )),
+              ),
+      ),
     );
   }
 }

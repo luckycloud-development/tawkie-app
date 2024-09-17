@@ -82,11 +82,11 @@ class TicketsController extends State<Tickets> {
   }
 
   Future<void> _checkRoomParticipants(Room room) async {
-    // Vérifie le nombre de participants pour déterminer le statut du ticket
+    // Always check participants' status, even if tickets have already been collected
     List<User> participants = room.getParticipants();
     String status = (participants.length == 2) ? 'open' : 'closed';
 
-    // Mets à jour le statut des tickets de cette room
+    // Update this room's ticket status
     for (var ticket in tickets) {
       if (ticket.roomId == room.id) {
         setState(() {
@@ -105,17 +105,16 @@ class TicketsController extends State<Tickets> {
     List<Room> allRooms = Matrix.of(context).client.rooms;
     List<Room> ticketRooms = [];
 
-    // Parcourir toutes les salles et vérifier si elles contiennent un état m.room.tawkie.ticket
+    // Browse all rooms and check for m.room.tawkie.ticket status
     for (var room in allRooms) {
       try {
         final stateEvent = await Matrix.of(context).client.getRoomStateWithKey(
               room.id,
               'm.room.tawkie.ticket',
-              // Type d'événement personnalisé pour les tickets
-              '', // Clé d'état vide car on n'a qu'une instance pour ce type
+              // Custom event type for tickets
+              '', // Empty status key because there is only one instance of this type
             );
 
-        // Si un tel événement existe, c'est un ticket
         ticketRooms.add(room);
       } catch (e) {
         if (kDebugMode) {
@@ -124,7 +123,7 @@ class TicketsController extends State<Tickets> {
       }
     }
 
-    return ticketRooms; // Retourne les salles marquées comme des tickets
+    return ticketRooms;
   }
 
   // Function to create a new direct chat with a user (forces creation of a new room)
