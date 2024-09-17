@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:tawkie/config/app_config.dart';
-import 'package:tawkie/pages/tickets/ticket_details_dialog.dart';
+import 'package:tawkie/pages/chat/chat.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
 import 'package:tawkie/widgets/platform_avatar.dart';
 import 'package:tawkie/widgets/ticket_status_badge.dart';
@@ -39,6 +39,7 @@ class TicketsPage extends StatelessWidget {
                                 platForm: ticket.platform,
                                 date: ticket.date,
                                 status: ticket.status,
+                                roomId: ticket.roomId!,
                               ),
                             );
                           },
@@ -170,13 +171,16 @@ class TicketTile extends StatelessWidget {
   final String platForm;
   final DateTime date;
   final String status;
+  final String roomId;
 
-  const TicketTile(
-      {super.key,
-      required this.title,
-      required this.platForm,
-      required this.date,
-      required this.status});
+  const TicketTile({
+    super.key,
+    required this.title,
+    required this.platForm,
+    required this.date,
+    required this.status,
+    required this.roomId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -238,19 +242,21 @@ class TicketTile extends StatelessWidget {
           ],
         ),
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return TicketDetailDialog(
-                title: title,
-                platform: platForm,
-                date: date,
-                status: status,
-              );
-            },
-          );
+          // Handle tap on a bot conversation
+          openChatRoom(roomId, context);
         },
       ),
+    );
+  }
+
+  // Method to handle chat tap
+  void openChatRoom(String roomId, BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatPage(
+                roomId: roomId,
+              )),
     );
   }
 }

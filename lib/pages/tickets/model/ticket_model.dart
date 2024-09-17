@@ -4,7 +4,7 @@ class Ticket {
   final String content;
   final DateTime date;
   String? roomId;
-  String status; // Ajouter le status
+  String status;
 
   Ticket({
     required this.version,
@@ -12,7 +12,7 @@ class Ticket {
     required this.content,
     required this.date,
     this.roomId,
-    required this.status, // Le statut est maintenant obligatoire
+    required this.status,
   });
 
   factory Ticket.fromRoomMessage(String message, DateTime date, String status) {
@@ -34,7 +34,7 @@ class Ticket {
         status: status,
       );
     } else {
-      throw FormatException("Message format is invalid");
+      throw const FormatException("Message format is invalid");
     }
   }
 }
