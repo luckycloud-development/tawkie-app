@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets_page.dart';
@@ -104,6 +105,7 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print("Error when creating a new room with the user $userId: $e");
       }
+      _showErrorDialog(context);
       return null;
     }
   }
@@ -154,6 +156,7 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print("Error sending message to room $roomId: $e");
       }
+      _showErrorDialog(context);
     }
   }
 
@@ -265,7 +268,28 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print('Error retrieving events for room ${room.id}: $e');
       }
+      _showErrorDialog(context);
     }
+  }
+
+  void _showErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(L10n.of(context)!.err_),
+          content: Text(L10n.of(context)!.rateLimit),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(L10n.of(context)!.close),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
