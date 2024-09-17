@@ -3,8 +3,9 @@ import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:tawkie/config/app_config.dart';
+import 'package:tawkie/pages/tickets/ticket_details_dialog.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
-import 'package:tawkie/utils/platform_infos.dart';
+import 'package:tawkie/widgets/platform_avatar.dart';
 
 class TicketsPage extends StatelessWidget {
   final TicketsController controller;
@@ -84,12 +85,12 @@ class TicketsPage extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Icon(Icons.insert_drive_file,
+                            const Icon(Icons.insert_drive_file,
                                 size: 30, color: Colors.white),
-                            SizedBox(width: 5),
+                            const SizedBox(width: 5),
                             Text(
                               tickets.length.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
@@ -149,7 +150,7 @@ class TicketsPage extends StatelessWidget {
                         vertical: 12, horizontal: 32),
                   ),
                   child: Text(L10n.of(context)!.ticketsOpenReport,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                           fontWeight: FontWeight.bold)),
@@ -212,13 +213,7 @@ class TicketTile extends StatelessWidget {
         ),
         subtitle: Row(
           children: [
-            CircleAvatar(
-              backgroundColor: PlatformInfos.getPlatformBackgroundColor(
-                  platForm), // Background color based on platform
-              radius: 15,
-              child:
-                  PlatformInfos.getPlatformIcon(platForm), // Icon remains white
-            ),
+            PlatformAvatar(platform: platForm),
             const SizedBox(
               width: 5.0,
             ),
@@ -243,7 +238,7 @@ class TicketTile extends StatelessWidget {
               ),
               child: Text(
                 status,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
@@ -257,6 +252,19 @@ class TicketTile extends StatelessWidget {
             ),
           ],
         ),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return TicketDetailDialog(
+                title: title,
+                platform: platForm,
+                date: date,
+                status: status,
+              );
+            },
+          );
+        },
       ),
     );
   }
