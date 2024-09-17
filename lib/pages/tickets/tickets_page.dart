@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets.dart';
+import 'package:tawkie/utils/platform_infos.dart';
 
 class TicketsPage extends StatelessWidget {
   final TicketsController controller;
@@ -31,7 +32,7 @@ class TicketsPage extends StatelessWidget {
                                   const EdgeInsets.symmetric(vertical: 5.0),
                               child: TicketTile(
                                 title: ticket.content,
-                                user: ticket.platform,
+                                platForm: ticket.platform,
                                 date: ticket.date.toString(),
                                 status: 'open',
                               ),
@@ -159,14 +160,14 @@ class TicketsPage extends StatelessWidget {
 
 class TicketTile extends StatelessWidget {
   final String title;
-  final String user;
+  final String platForm;
   final String date;
   final String status;
 
   const TicketTile(
       {super.key,
       required this.title,
-      required this.user,
+      required this.platForm,
       required this.date,
       required this.status});
 
@@ -203,15 +204,17 @@ class TicketTile extends StatelessWidget {
         subtitle: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.grey[400],
+              backgroundColor: PlatformInfos.getPlatformBackgroundColor(
+                  platForm), // Background color based on platform
               radius: 15,
-              child: Text(user[0], style: const TextStyle(color: Colors.white)),
+              child:
+                  PlatformInfos.getPlatformIcon(platForm), // Icon remains white
             ),
             const SizedBox(
               width: 5.0,
             ),
             Text(
-              'by $user',
+              platForm,
               style: TextStyle(color: isDarkMode ? Colors.black : Colors.grey),
             )
           ],
