@@ -22,10 +22,18 @@ class TicketsController extends State<Tickets> {
   List<Ticket> filteredTickets = [];
   bool loading = true;
 
+  bool stopProcess = false;
+
   @override
   void initState() {
     super.initState();
     _initializeTickets();
+  }
+
+  @override
+  void dispose() {
+    stopProcess = true;
+    super.dispose();
   }
 
   Future<void> _initializeTickets() async {
@@ -34,10 +42,12 @@ class TicketsController extends State<Tickets> {
       await getTicketsFromRoom(room);
     }
 
-    setState(() {
-      loading = false;
-      filteredTickets = tickets;
-    });
+    if (mounted) {
+      setState(() {
+        loading = false;
+        filteredTickets = tickets;
+      });
+    }
   }
 
   // Filter tickets by search text
@@ -48,7 +58,7 @@ class TicketsController extends State<Tickets> {
       } else {
         filteredTickets = tickets
             .where((ticket) =>
-            ticket.content.toLowerCase().contains(searchText.toLowerCase()))
+                ticket.content.toLowerCase().contains(searchText.toLowerCase()))
             .toList();
       }
     });
@@ -60,9 +70,11 @@ class TicketsController extends State<Tickets> {
 
     List<Room> filteredRooms = getRoomsWithUser(allRooms, userId);
 
-    setState(() {
-      this.filteredRooms = filteredRooms;
-    });
+    if (mounted) {
+      setState(() {
+        this.filteredRooms = filteredRooms;
+      });
+    }
 
     // For each filtered room, retrieve the tickets
     for (var room in filteredRooms) {
@@ -182,41 +194,73 @@ class TicketsController extends State<Tickets> {
         return;
       }
 
-      final eventsResponse = await Matrix.of(context).client.getRoomEvents(
-            room.id,
-            Direction.b,
-            limit: 50,
-          );
+      String? fromToken;
+      bool moreMessagesExist = true;
 
-      List<Ticket> newTickets = eventsResponse.chunk
-          .map((event) {
-            Map<String, Object?> content = event.content;
+      // Continue fetching messages until there are no more
+      while (moreMessagesExist || !stopProcess) {
+        // Fetch a batch of messages
+        final eventsResponse = await Matrix.of(context).client.getRoomEvents(
+              room.id,
+              Direction.b,
+              limit: 5,
+              from: fromToken, // Pagination token
+            );
 
-            String? messageBody = content['body'] as String?;
-            if (messageBody != null) {
-              if (kDebugMode) {
-                print("Text message: $messageBody");
+        if (eventsResponse.chunk.isEmpty) {
+          moreMessagesExist = false;
+          break; // No more messages to fetch
+        }
+
+        // Process the messages and attempt to extract tickets
+        List<Ticket> newTickets = eventsResponse.chunk
+            .map((event) {
+              Map<String, Object?> content = event.content;
+
+              String? messageBody = content['body'] as String?;
+              if (messageBody != null) {
+                if (kDebugMode) {
+                  print("Text message: $messageBody");
+                }
+                try {
+                  DateTime date = event.originServerTs;
+
+                  // Try to create a ticket from the message
+                  return Ticket.fromRoomMessage(messageBody, date)
+                    ..roomId = room.id;
+                } catch (e) {
+                  // Handle invalid message formats without stopping the process
+                  if (kDebugMode) {
+                    print("Error parsing message: $e");
+                  }
+                  return null; // Ignore invalid messages
+                }
+              } else {
+                if (kDebugMode) {
+                  print("No text found in the message");
+                }
+                return null;
               }
-            } else {
-              if (kDebugMode) {
-                print("No text found in the message");
-              }
-              return null;
-            }
+            })
+            .where((ticket) => ticket != null) // Filter out null tickets
+            .cast<Ticket>()
+            .toList();
 
-            DateTime date = event.originServerTs;
+        // Add new tickets to the list
+        if (mounted) {
+          setState(() {
+            tickets.addAll(newTickets);
+          });
+        }
 
-            // Create a ticket from the message and add the room id to avoid duplicates
-            return Ticket.fromRoomMessage(messageBody, date)..roomId = room.id;
-          })
-          .where((ticket) => ticket != null)
-          .cast<Ticket>()
-          .toList();
+        // Update the pagination token to fetch older messages in the next iteration
+        fromToken = eventsResponse.end;
 
-      setState(() {
-        // Add new tickets without duplicates
-        tickets.addAll(newTickets);
-      });
+        // If the end token is null, there are no more messages to fetch
+        if (fromToken == null) {
+          moreMessagesExist = false;
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Error retrieving events for room ${room.id}: $e');
