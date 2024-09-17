@@ -31,6 +31,10 @@ class TicketsController extends State<Tickets> {
     for (var room in filteredRooms) {
       await getTicketsFromRoom(room);
     }
+
+    setState(() {
+      loading = false;
+    });
   }
 
   // Method to recover and filter rooms
@@ -114,10 +118,6 @@ class TicketsController extends State<Tickets> {
         tickets.add(newTicket);
       });
 
-      setState(() {
-        loading = false;
-      });
-
       if (kDebugMode) {
         print("Message sent in the room $roomId.");
       }
@@ -199,10 +199,6 @@ class TicketsController extends State<Tickets> {
       setState(() {
         // Add new tickets without duplicates
         tickets.addAll(newTickets);
-      });
-
-      setState(() {
-        loading = false;
       });
     } catch (e) {
       if (kDebugMode) {

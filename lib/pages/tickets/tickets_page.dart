@@ -20,23 +20,35 @@ class TicketsPage extends StatelessWidget {
             // Adjusting for space with AppBar
             child: Column(
               children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: tickets.length,
-                    itemBuilder: (context, index) {
-                      final ticket = tickets[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: TicketTile(
-                          title: ticket.content,
-                          user: ticket.platform,
-                          date: ticket.date.toString(),
-                          status: 'open',
+                controller.tickets.isNotEmpty
+                    ? Expanded(
+                        child: ListView.builder(
+                          itemCount: tickets.length,
+                          itemBuilder: (context, index) {
+                            final ticket = tickets[index];
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 5.0),
+                              child: TicketTile(
+                                title: ticket.content,
+                                user: ticket.platform,
+                                date: ticket.date.toString(),
+                                status: 'open',
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      )
+                    : Expanded(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height / 2,
+                          child: Center(
+                            child:
+                                Text("Vous n'avez pas encore reporté de bugs"),
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
