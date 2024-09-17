@@ -204,6 +204,7 @@ class TicketTile extends StatelessWidget {
           title,
           style: const TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+          overflow: TextOverflow.ellipsis, // for ellipsis points
         ),
         subtitle: Row(
           children: [
