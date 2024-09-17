@@ -2882,5 +2882,10 @@
     "leaveTheConvSuccess": "Vous avez quitté la conversation.",
     "chatBotRoomsTitle": "Conversations des bots",
     "chatBotRoomsNotFound": "Aucune conversation avec les bots.",
-    "ticketsTitlePage": "Report de bugs"
+    "ticketsTitlePage": "Report de bugs",
+    "ticketsPageEmpty": "Vous n'avez pas encore ouvert de rapports",
+    "ticketsReports": "Rapports",
+    "ticketsOpenReport": "Ouvrir un rapport",
+    "ticketsDescribe": "Décrivez le problème",
+    "ticketsDescribeHint": "Entrez la description du problème..."
 }

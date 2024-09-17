@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:tawkie/config/app_config.dart';
@@ -46,8 +47,7 @@ class TicketsPage extends StatelessWidget {
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height / 2,
                           child: Center(
-                            child:
-                                Text("Vous n'avez pas encore reporté de bugs"),
+                            child: Text(L10n.of(context)!.ticketsPageEmpty),
                           ),
                         ),
                       ),
@@ -75,8 +75,8 @@ class TicketsPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tickets',
-                          style: TextStyle(
+                          L10n.of(context)!.ticketsReports,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -107,7 +107,7 @@ class TicketsPage extends StatelessWidget {
                     child: TextField(
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: 'Recherche',
+                        hintText: L10n.of(context)!.search,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
@@ -148,7 +148,7 @@ class TicketsPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 32),
                   ),
-                  child: Text('Open Tikets',
+                  child: Text(L10n.of(context)!.ticketsOpenReport,
                       style: TextStyle(
                           fontSize: 16,
                           color: Colors.black,
@@ -250,7 +250,7 @@ class TicketTile extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 4), // Spacing between the badge and the date
+            const SizedBox(height: 4),
             Text(
               formattedDate,
               style: TextStyle(color: isDarkMode ? Colors.black : Colors.grey),
