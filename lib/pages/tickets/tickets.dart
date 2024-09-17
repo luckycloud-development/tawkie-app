@@ -18,6 +18,7 @@ class TicketsController extends State<Tickets> {
   String userId = '@honoroit:alpha.tawkie.fr';
   List<Room> filteredRooms = [];
   List<Ticket> tickets = [];
+  bool loading = true;
 
   @override
   void initState() {
@@ -112,6 +113,10 @@ class TicketsController extends State<Tickets> {
         tickets.add(newTicket);
       });
 
+      setState(() {
+        loading = false;
+      });
+
       print("Message envoyé dans la room $roomId.");
     } catch (e) {
       print("Erreur lors de l'envoi du message dans la room $roomId: $e");
@@ -147,7 +152,8 @@ class TicketsController extends State<Tickets> {
     try {
       if (tickets.any((ticket) => ticket.roomId == room.id)) {
         if (kDebugMode) {
-          print('Tickets for this room have already been collected: ${room.id}');
+          print(
+              'Tickets for this room have already been collected: ${room.id}');
         }
         return;
       }
@@ -183,6 +189,10 @@ class TicketsController extends State<Tickets> {
         // Add new tickets without duplicates
         tickets.addAll(newTickets);
       });
+
+      setState(() {
+        loading = false;
+      });
     } catch (e) {
       print('Error retrieving events for room ${room.id}: $e');
     }
@@ -190,8 +200,14 @@ class TicketsController extends State<Tickets> {
 
   @override
   Widget build(BuildContext context) {
-    return TicketsPage(
-      controller: this,
-    );
+    if (loading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      return TicketsPage(
+        controller: this,
+      );
+    }
   }
 }
