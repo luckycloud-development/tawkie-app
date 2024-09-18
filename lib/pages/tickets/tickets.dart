@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets_page.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/matrix.dart';
 
+import 'error_dialog.dart';
 import 'model/ticket_model.dart';
 
 class Tickets extends StatefulWidget {
@@ -140,7 +140,7 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print("Error when creating a new room with the user $userId: $e");
       }
-      _showErrorDialog(context);
+      showErrorDialog(context);
       return null;
     }
   }
@@ -191,7 +191,7 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print("Error sending message to room $roomId: $e");
       }
-      _showErrorDialog(context);
+      showErrorDialog(context);
     }
   }
 
@@ -227,8 +227,8 @@ class TicketsController extends State<Tickets> {
       await Matrix.of(context).client.setRoomStateWithKey(
         roomId,
         'm.room.tawkie.ticket',
-        // Type d'événement personnalisé pour les tickets
-        '', // Clé d'état (peut être vide si une seule instance)
+        // Custom event type for tickets
+        '', // Status key (can be empty if only one instance)
         {
           'created_at': DateTime.now().toIso8601String(),
         },
@@ -365,28 +365,8 @@ class TicketsController extends State<Tickets> {
       if (kDebugMode) {
         print('Error retrieving events for room ${room.id}: $e');
       }
-      _showErrorDialog(context);
+      showErrorDialog(context);
     }
-  }
-
-  void _showErrorDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(L10n.of(context)!.err_),
-          content: Text(L10n.of(context)!.rateLimit),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text(L10n.of(context)!.close),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
