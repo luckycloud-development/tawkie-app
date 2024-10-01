@@ -38,8 +38,11 @@ void main() async {
 
     UpdatWidget(
       currentVersion: currentVersion,
-      getLatestVersion: () => checkForUpdate(),
-      getBinaryUrl: (latestVersion) => checkForUpdate(),
+      getLatestVersion: () => getLatestVersionFromGitHub(),
+      getBinaryUrl: (latestVersion) async {
+        final url = await getWindowsExeDownloadUrl();
+        return url ?? "";
+      },
       // Lastly, enter your app name so we know what to call your files.
       appName: AppConfig.applicationName,
     );
