@@ -10,12 +10,9 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tawkie/config/app_config.dart';
-import 'package:tawkie/services/update_service.dart';
-import 'package:tawkie/utils/app_info.dart';
 import 'package:tawkie/utils/client_manager.dart';
 import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/error_widget.dart';
-import 'package:updat/updat.dart';
 import 'config/setting_keys.dart';
 import 'utils/background_push.dart';
 import 'widgets/fluffy_chat_app.dart';
@@ -29,23 +26,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (PlatformInfos.shouldInitializePurchase()) {
     await initPlatformState();
-  }
-
-  // Update check only for Windows
-  if (PlatformInfos.isWindows) {
-
-    final String currentVersion = await getAppVersion();
-
-    UpdatWidget(
-      currentVersion: currentVersion,
-      getLatestVersion: () => getLatestVersionFromGitHub(),
-      getBinaryUrl: (latestVersion) async {
-        final url = await getWindowsExeDownloadUrl();
-        return url ?? "";
-      },
-      // Lastly, enter your app name so we know what to call your files.
-      appName: AppConfig.applicationName,
-    );
   }
 
   Logs().nativeColors = !PlatformInfos.isIOS;
