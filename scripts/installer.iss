@@ -1,15 +1,15 @@
 [Setup]
 AppName=Tawkie
-AppVersion={#GetVersion()}
+AppVersion={#MyAppVersion}
 DefaultDirName={pf}\Tawkie
 DefaultGroupName=Tawkie
-OutputDir=Output
+OutputDir=..\build\windows\x64\runner\Release
 OutputBaseFilename=TawkieInstaller
 Compression=lzma
 SolidCompression=yes
 
 [Files]
-Source: "build/windows/runner/Release/*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Tawkie"; Filename: "{app}\Tawkie.exe"
