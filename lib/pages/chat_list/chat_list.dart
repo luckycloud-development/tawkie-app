@@ -629,38 +629,37 @@ class ChatListController extends State<ChatList>
     // Call UpdatWidget in initState to run when page is opened
     if (PlatformInfos.isWindows) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        try {
-          final String currentVersion = await getAppVersion();
-          final latestVersion = await getLatestVersionFromGitHub();
-          final binaryUrl = await getWindowsExeDownloadUrl();
+        final String currentVersion = await getAppVersion();
+        final latestVersion = await getLatestVersionFromGitHub();
+        final binaryUrl = await getWindowsExeDownloadUrl();
 
-          // If the version or URL of the exe file is unavailable, do not display anything.
-          if (latestVersion == null || binaryUrl == null) {
-            print("Informations de mise à jour indisponibles. Aucune mise à jour affichée.");
-            return;
+        // If the version or URL of the exe file is unavailable, do not display anything.
+        if (latestVersion == null || binaryUrl == null) {
+          if (kDebugMode) {
+            print("Update information unavailable. No update displayed.");
           }
-
-          // If all goes well, the update widget is displayed
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                content: UpdatWidget(
-                  currentVersion: currentVersion,
-                  getLatestVersion: () => Future.value(latestVersion),
-                  getBinaryUrl: (latestVersion) async {
-                    return binaryUrl;
-                  },
-                  appName: AppConfig.applicationName,
-                  openOnDownload: true,
-                ),
-              );
-            },
-          );
-        } catch (e) {
-          print("Erreur lors de la vérification des mises à jour : $e");
+          return;
         }
+
+        // If all goes well, the update widget is displayed
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return AlertDialog(
+              content:
+              UpdatWidget(
+                currentVersion: currentVersion,
+                getLatestVersion: () => Future.value(latestVersion),
+                getBinaryUrl: (latestVersion) async {
+                  return binaryUrl;
+                },
+                appName: AppConfig.applicationName,
+                openOnDownload: true,
+              ),
+            );
+          },
+        );
       });
     }
 
