@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:tawkie/utils/app_info.dart';
 
 Future<String?> getLatestVersionFromGitHub() async {
   final String url = "https://api.github.com/repos/Tawkie/tawkie-app/releases/latest";
@@ -8,12 +8,17 @@ Future<String?> getLatestVersionFromGitHub() async {
 
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
-    final latestVersion = data['tag_name']; // Retrieves the tag for the latest version
+    String latestVersion = data['tag_name']; // Retrieves the tag for the latest version
 
-    print("La dernière version récupérée de GitHub : $latestVersion");
+    // Remove the first character 'v'
+    if (latestVersion.startsWith('v')) {
+      latestVersion = latestVersion.substring(1);
+    }
     return latestVersion;
   } else {
-    print('Erreur lors de la récupération des informations de version : ${response.statusCode}');
+    if (kDebugMode) {
+      print('Error retrieving version information: ${response.statusCode}');
+    }
     return null;
   }
 }
@@ -34,14 +39,20 @@ Future<String?> getWindowsExeDownloadUrl() async {
           return asset['browser_download_url'];
         }
       }
-      print('Aucun fichier .exe trouvé dans les assets de la release.');
+      if (kDebugMode) {
+        print('No .exe files found in release assets.');
+      }
       return null;
     } else {
-      print('Erreur lors de la récupération des informations de la release : ${response.statusCode}');
+      if (kDebugMode) {
+        print('Error retrieving release information: ${response.statusCode}');
+      }
       return null;
     }
   } catch (e) {
-    print("Erreur lors de la récupération de l'URL : $e");
+    if (kDebugMode) {
+      print("Error retrieving URL:$e");
+    }
     return null;
   }
 }
