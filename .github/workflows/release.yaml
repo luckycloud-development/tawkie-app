@@ -64,7 +64,7 @@ jobs:
           personal_token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
           publish_dir: ./public
           publish_branch: gh-pages
-          cname: fluffychat.im
+          cname: tawkie.im
 
   build_apk:
     runs-on: ubuntu-latest
@@ -127,7 +127,7 @@ jobs:
       - run: cat .github/workflows/versions.env >> $GITHUB_ENV
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.19.6 # Workaround for not working on 3.22
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install curl clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libjsoncpp-dev cmake-data libsecret-1-dev libsecret-1-0 librhash0 libssl-dev -y
@@ -214,7 +214,7 @@ jobs:
           # fi
           cd ..
 
-  build-ios:
+  build_ios:
     runs-on: macos-14
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
@@ -259,6 +259,65 @@ jobs:
           ASC_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
           SIGNING_KEY_PASSWORD: ${{ secrets.IOS_DIST_SIGNING_KEY_PASSWORD }}
           SIGNING_KEY_FILE_PATH: signing-cert.p12
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks and downloads project source code from GitHub repository
+
+      - name: Setup environment variables
+        run: cat .github/workflows/versions.env >> $GITHUB_ENV
+        # Load environment variables from versions.env file
+
+      - name: Get tag
+        id: tag
+        run: |
+          echo "TAG=$(git describe --tags)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Prepare Windows environment
+        run: ./scripts/prepare-windows.ps1
+        shell: pwsh
+        # Executes PowerShell script to prepare Windows environment
+
+      - name: Build OLM library for Windows
+        run: ./scripts/build-olm-windows.sh
+        shell: bash
+        # Run the Olm compiler script for cryptography if use Matrix
+
+      - name: Get Flutter dependencies
+        run: |
+          "C:\\tools\\flutter\\bin\\flutter" pub get
+        shell: cmd
+
+      - name: Build Windows Release
+        run: |
+          "C:\\tools\\flutter\\bin\\flutter" build windows --release
+        shell: cmd
+
+      # Install Inno Setup via Chocolatey
+      - name: Install Inno Setup
+        run: choco install innosetup --confirm
+        shell: cmd
+
+      # Use the Inno Setup script to create the installer
+      - name: Create Installer
+        run: |
+          "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe" /dMyAppVersion=${{ env.TAG }} scripts/installer.iss
+        shell: cmd
+
+      # Upload archive to GitHub release page
+      - name: Upload Windows Installer to GitHub
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "build/windows/x64/runner/Release/TawkieInstaller.exe"
+          asset_name: "TawkieInstaller-${{ env.TAG }}.exe"
+          asset_content_type: application/vnd.microsoft.portable-executable
 
   # promote_snapcraft:
   #   runs-on: ubuntu-latest
