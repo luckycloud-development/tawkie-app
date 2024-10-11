@@ -4,6 +4,7 @@ import 'package:matrix/matrix.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/tickets/tickets_page.dart';
 import 'package:tawkie/utils/platform_infos.dart';
+import 'package:tawkie/utils/room_utils.dart';
 import 'package:tawkie/widgets/matrix.dart';
 
 import 'error_dialog.dart';
@@ -102,29 +103,12 @@ class TicketsController extends State<Tickets> {
 
   // Function to obtain rooms where a specific user is present
   Future<List<Room>> getTicketRooms() async {
-    List<Room> allRooms = Matrix.of(context).client.rooms;
-    List<Room> ticketRooms = [];
-
-    // Browse all rooms and check for m.room.tawkie.ticket status
-    for (var room in allRooms) {
-      try {
-        final stateEvent = await Matrix.of(context).client.getRoomStateWithKey(
-              room.id,
-              'm.room.tawkie.ticket',
-              // Custom event type for tickets
-              '', // Empty status key because there is only one instance of this type
-            );
-
-        ticketRooms.add(room);
-      } catch (e) {
-        if (kDebugMode) {
-          print('No ticket metadata found for room ${room.id}: $e');
-        }
-      }
-    }
-
-    return ticketRooms;
+    return getFilteredRooms(
+      context,
+      key: 'm.room.tawkie.ticket',
+    );
   }
+
 
   // Function to create a new direct chat with a user (forces creation of a new room)
   Future<String?> createNewDirectChatWithUser(String userId) async {
