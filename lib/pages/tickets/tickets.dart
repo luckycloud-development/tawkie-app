@@ -85,7 +85,10 @@ class TicketsController extends State<Tickets> {
   Future<void> _checkRoomParticipants(Room room) async {
     // Always check participants' status, even if tickets have already been collected
     List<User> participants = room.getParticipants();
-    String status = (participants.length == 2) ? 'open' : 'closed';
+
+    bool isHonoroitPresent = participants.any((user) => user.id == userId);
+
+    String status = isHonoroitPresent ? 'open' : 'closed';
 
     // Update this room's ticket status
     for (var ticket in tickets) {
