@@ -285,20 +285,12 @@ class ChatListController extends State<ChatList>
     return quickCheck;
   }
 
-  Future<void> _loadFilteredRooms() async {
-    // Calls the asynchronous function to obtain filtered salons
-    _filteredRooms = await getFilteredRooms(
-      context,
-      additionalFilter: (room) => getRoomFilterByActiveFilter(activeFilter)(room) && hideBotsRoomFilter(room),
-    );
-
-    // Update status to notify dependent widgets
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  List<Room> get filteredRooms => _filteredRooms;
+  List<Room> get filteredRooms => Matrix.of(context)
+      .client
+      .rooms
+      .where(getRoomFilterByActiveFilter(activeFilter))
+      .where(hideBotsRoomFilter)
+      .toList();
 
   Future<bool> isGroupWithOnlyBotAndUser(Room room) async {
     final client = Matrix.of(context).client;
@@ -639,7 +631,6 @@ class ChatListController extends State<ChatList>
     _waitForFirstSync();
     _hackyWebRTCFixForWeb();
     CallKeepManager().initialize();
-    _loadFilteredRooms();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
