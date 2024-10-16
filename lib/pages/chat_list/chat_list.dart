@@ -287,7 +287,31 @@ class ChatListController extends State<ChatList>
       .rooms
       .where(getRoomFilterByActiveFilter(activeFilter))
       .where(hideBotsRoomFilter)
-      .toList();
+      .toList()
+    ..sort((a, b) {
+      // Function to obtain the timestamp from the last message-type event, or 0 if not found
+      DateTime getLastMessageTime(Room room) {
+        if (room.lastEvent != null && room.lastEvent!.type == 'm.room.message') {
+          // Checks event type
+          String msgtype = room.lastEvent!.content['msgtype'] as String? ?? '';
+          if (msgtype == 'm.text' || msgtype == 'm.image' ||
+              msgtype == 'm.video' || msgtype == 'm.file') {
+            return room.lastEvent!.originServerTs;
+          }
+        }
+        // Returns a default date if the last event is not a message
+        return DateTime(0);
+      }
+
+      DateTime timeA = getLastMessageTime(a);
+      DateTime timeB = getLastMessageTime(b);
+
+      return timeB.compareTo(timeA);
+    });
+
+
+
+
 
   Future<bool> isGroupWithOnlyBotAndUser(Room room) async {
     final client = Matrix.of(context).client;
