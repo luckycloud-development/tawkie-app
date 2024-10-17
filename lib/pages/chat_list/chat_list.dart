@@ -289,24 +289,30 @@ class ChatListController extends State<ChatList>
       .where(hideBotsRoomFilter)
       .toList()
     ..sort((a, b) {
-      // Function to obtain the timestamp of the last message-type event, excluding those from bots
+
+      bool isValidMessageTypeToSort(String? msgtype) {
+        return msgtype == 'm.text' || msgtype == 'm.image' ||
+            msgtype == 'm.video' || msgtype == 'm.file';
+      }
+
+      bool isBotSender(String senderId) {
+        return senderId.startsWith('@instagram2bot:') ||
+            senderId.startsWith('@messenger2Bot:');
+      }
+
+      // Function to obtain the timestamp of the last message-type event excluding bots
       DateTime getLastMessageTime(Room room) {
-        if (room.lastEvent != null && room.lastEvent!.type == 'm.room.message') {
-          // Check event type
-          String msgtype = room.lastEvent!.content['msgtype'] as String? ?? '';
-          String senderId = room.lastEvent!.senderId;
+        final lastEvent = room.lastEvent;
 
-          // Checks if the message is sent by a bot
-          bool isBotSender = senderId.startsWith('@instagram2bot:') ||
-              senderId.startsWith('@messenger2Bot:');
+        if (lastEvent != null && lastEvent.type == 'm.room.message') {
+          String msgtype = lastEvent.content['msgtype'] as String? ?? '';
+          String senderId = lastEvent.senderId;
 
-          // If the message is valid and not sent by a bot
-          if ((msgtype == 'm.text' || msgtype == 'm.image' ||
-              msgtype == 'm.video' || msgtype == 'm.file') && !isBotSender) {
-            return room.lastEvent!.originServerTs;
+          // Checks if the message is relevant
+          if (isValidMessageTypeToSort(msgtype) && !isBotSender(senderId)) {
+            return lastEvent.originServerTs;
           }
         }
-        // Returns a default date if the last event is not a message or comes from a bot
         return DateTime(0);
       }
 
