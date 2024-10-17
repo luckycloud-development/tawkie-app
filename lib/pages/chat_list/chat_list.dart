@@ -289,17 +289,24 @@ class ChatListController extends State<ChatList>
       .where(hideBotsRoomFilter)
       .toList()
     ..sort((a, b) {
-      // Function to obtain the timestamp from the last message-type event, or 0 if not found
+      // Function to obtain the timestamp of the last message-type event, excluding those from bots
       DateTime getLastMessageTime(Room room) {
         if (room.lastEvent != null && room.lastEvent!.type == 'm.room.message') {
-          // Checks event type
+          // Check event type
           String msgtype = room.lastEvent!.content['msgtype'] as String? ?? '';
-          if (msgtype == 'm.text' || msgtype == 'm.image' ||
-              msgtype == 'm.video' || msgtype == 'm.file') {
+          String senderId = room.lastEvent!.senderId;
+
+          // Checks if the message is sent by a bot
+          bool isBotSender = senderId.startsWith('@instagram2bot:') ||
+              senderId.startsWith('@messenger2Bot:');
+
+          // If the message is valid and not sent by a bot
+          if ((msgtype == 'm.text' || msgtype == 'm.image' ||
+              msgtype == 'm.video' || msgtype == 'm.file') && !isBotSender) {
             return room.lastEvent!.originServerTs;
           }
         }
-        // Returns a default date if the last event is not a message
+        // Returns a default date if the last event is not a message or comes from a bot
         return DateTime(0);
       }
 
@@ -308,10 +315,6 @@ class ChatListController extends State<ChatList>
 
       return timeB.compareTo(timeA);
     });
-
-
-
-
 
   Future<bool> isGroupWithOnlyBotAndUser(Room room) async {
     final client = Matrix.of(context).client;
