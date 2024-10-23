@@ -15,14 +15,15 @@ import 'package:tawkie/pages/add_bridge/show_bottom_sheet.dart';
 import 'package:tawkie/pages/add_bridge/success_message.dart';
 import 'package:tawkie/pages/add_bridge/web_view_connection.dart';
 import 'package:tawkie/utils/bridge_utils.dart';
+import 'package:tawkie/utils/platform_infos.dart';
 import 'package:tawkie/widgets/matrix.dart';
 import 'package:tawkie/widgets/notifier_state.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 import 'bot_chat_list.dart';
-import 'connection_bridge_dialog.dart';
 import 'delete_conversation_dialog.dart';
 import 'error_message_dialog.dart';
+import 'login_form.dart';
 import 'model/social_network.dart';
 
 enum ConnectionStatus {
@@ -788,9 +789,11 @@ class BotController extends State<AddBridge> {
   /// Handle connection to a social network
   Future<void> processSocialNetworkAuthentication(
       BuildContext context, SocialNetwork network) async {
+    final connectionState =
+    Provider.of<ConnectionStateModel>(context, listen: false);
     switch (network.name) {
       case "WhatsApp":
-        await connectToWhatsApp(context, network, this);
+        await startBridgeLogin(context, connectionState, network);
         break;
       case "Instagram":
       case "Facebook Messenger":
@@ -832,9 +835,46 @@ class BotController extends State<AddBridge> {
   // 📌 ************************** Messenger & Instagram **************************
   // 📌 ***********************************************************************
 
+  Future<void> handleStepResponse(
+      Response response, SocialNetwork network) async {
+    if (response.statusCode == 200) {
+      final stepData = response.data;
+      if (stepData['type'] == 'complete') {
+        setState(() => network.updateConnectionResult(true));
+        if (kDebugMode) print("Login successful for ${network.name}");
+      } else {
+        network.setError(true);
+        _handleError(network, ConnectionError.unknown, 'Unexpected response type: ${stepData['type']}');
+      }
+    } else {
+      network.setError(true);
+      _handleError(network, ConnectionError.unknown, 'Error submitting step: ${response.statusCode}');
+    }
+  }
+
+
+  Future<void> loginWithCookies(SocialNetwork network, String loginId, String stepId, String stepType) async {
+    final userId = client.userID;
+    final cookieManager = WebviewCookieManager();
+
+    if (stepType == 'user_input' || stepType == 'cookies') {
+      // Retrieve cookies
+      final gotCookies = await cookieManager.getCookies(network.urlRedirect);
+      final formattedCookieString = formatCookiesToJsonApi(gotCookies);
+
+      // Submit cookies to the login process step
+      final stepUrl = '/${network.apiPath}/_matrix/provision/v3/login/step/$loginId/$stepId/cookies?user_id=$userId';
+
+      final stepResponse = await dio.post(stepUrl, data: formattedCookieString);
+
+      await handleStepResponse(stepResponse, network);
+    } else {
+      network.setError(true);
+      _handleError(network, ConnectionError.unknown, 'Unexpected step type: $stepType');
+    }
+  }
   Future<void> startBridgeLogin(
       BuildContext context,
-      WebviewCookieManager cookieManager,
       ConnectionStateModel connectionState,
       SocialNetwork network,
       ) async {
@@ -863,33 +903,20 @@ class BotController extends State<AddBridge> {
           );
         }
 
-        // Step 2: If the next step is user input or cookies, prepare to submit cookies
-        if (stepType == 'user_input' || stepType == 'cookies') {
-          // Retrieve cookies
-          final gotCookies = await cookieManager.getCookies(network.urlRedirect);
-          final formattedCookieString = formatCookiesToJsonApi(gotCookies);
+        // Step 2: For differents methods
+        switch (network.name) {
 
-          // Submit cookies to the login process step
-          final stepUrl = '/${network.apiPath}/_matrix/provision/v3/login/step/$loginId/$stepId/cookies?user_id=$userId';
+          case "Facebook Messenger":
+          case "Instagram":
+            await loginWithCookies(network, loginId, stepId, stepType);
+            break;
 
-          final stepResponse = await dio.post(stepUrl, data: formattedCookieString);
-
-          if (stepResponse.statusCode == 200) {
-            final stepData = stepResponse.data;
-            if (stepData['type'] == 'complete') {
-              setState(() => network.updateConnectionResult(true));
-              if (kDebugMode) print('Login successful for ${network.name}');
-            } else {
-              network.setError(true);
-              _handleError(network, ConnectionError.unknown, 'Unexpected response type: ${stepData['type']}');
-            }
-          } else {
+          default:
             network.setError(true);
-            _handleError(network, ConnectionError.unknown, 'Error submitting step: ${stepResponse.statusCode}');
-          }
-        } else {
-          network.setError(true);
-          _handleError(network, ConnectionError.unknown, 'Unexpected step type: $stepType');
+            if (kDebugMode) {
+              print('Unsupported network for login: ${network.name}');
+            }
+            break;
         }
       } else {
         network.setError(true);
