@@ -894,8 +894,28 @@ class BotController extends State<AddBridge> {
     }
   }
 
-  Future<void> loginWithQRCode(SocialNetwork network, String loginId, String stepId) async {
-    //Todo: Make the function
+  Future<void> loginWithQRCode(SocialNetwork network, dynamic startData) async {
+    final data = startData['display_and_wait']['data'];
+    final stepType = startData['type'];
+
+    if (stepType == 'display_and_wait') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => QRCodeConnectPage(
+            qrCode: data,
+            code: null,
+            stepData: startData,
+            botConnection: this,
+            socialNetwork: network,
+          ),
+        ),
+      );
+
+    } else {
+      network.setError(true);
+      _handleError(network, ConnectionError.unknown, 'Unexpected step type: $stepType');
+    }
   }
 
   Future<void> loginWithPhone(SocialNetwork network, dynamic startData) async {
@@ -1044,8 +1064,6 @@ class BotController extends State<AddBridge> {
     // Step 1: Start the login process
     final loginStartUrl = '/${network.apiPath}/_matrix/provision/v3/login/start/$flowID?user_id=$userId';
 
-    print("loginStartUrl: $loginStartUrl");
-
     try {
       // Initiate the login process
       final startResponse = await dio.post(loginStartUrl);
@@ -1067,7 +1085,7 @@ class BotController extends State<AddBridge> {
             if(PlatformInfos.isMobile){
               await loginWithPhone(network, startData);
             }else{
-              await loginWithQRCode(network, loginId, stepId);
+              await loginWithQRCode(network, startData);
             }
             break;
 

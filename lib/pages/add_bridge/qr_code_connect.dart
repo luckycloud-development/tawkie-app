@@ -128,6 +128,7 @@ class QRExplanation extends StatelessWidget {
           data: qrCode!,
           version: QrVersions.auto,
           size: 300,
+          backgroundColor: Colors.white,
         );
       }
 
