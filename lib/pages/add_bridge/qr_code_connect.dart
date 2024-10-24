@@ -39,8 +39,6 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
         await widget.botConnection.checkLoginStatus(widget.socialNetwork,  widget.stepData);
         return "waiting";
       });
-    } else {
-      responseFuture = widget.botConnection.fetchDataWhatsApp();
     }
   }
 
