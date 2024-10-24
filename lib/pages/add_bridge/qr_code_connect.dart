@@ -26,8 +26,7 @@ class QRCodeConnectPage extends StatefulWidget {
 }
 
 class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
-  late Future<String> responseFuture;
-  bool _isDialogShown = false;
+  late Future<void> responseFuture;
 
   @override
   void initState() {
@@ -37,7 +36,6 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
     if (widget.socialNetwork.name == "WhatsApp") {
       responseFuture = Future(() async {
         await widget.botConnection.checkLoginStatus(widget.socialNetwork,  widget.stepData);
-        return "waiting";
       });
     }
   }
@@ -47,12 +45,6 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
   void dispose() {
     widget.botConnection.stopProcess();
     super.dispose();
-  }
-
-  void _setDialogShown() {
-    setState(() {
-      _isDialogShown = true;
-    });
   }
 
   @override
@@ -78,8 +70,6 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
               QRFutureBuilder(
                 responseFuture: responseFuture,
                 network: widget.socialNetwork,
-                isDialogShown: _isDialogShown,
-                setDialogShown: _setDialogShown,
               ),
             ],
           ),
@@ -188,17 +178,13 @@ class QRExplanation extends StatelessWidget {
 
 // FutureBuilder part listening to responses in real time
 class QRFutureBuilder extends StatelessWidget {
-  final Future<String> responseFuture;
+  final Future<void> responseFuture;
   final SocialNetwork network;
-  final bool isDialogShown;
-  final VoidCallback setDialogShown;
 
   const QRFutureBuilder({
     super.key,
     required this.responseFuture,
     required this.network,
-    required this.isDialogShown,
-    required this.setDialogShown,
   });
 
   @override
@@ -211,82 +197,8 @@ class QRFutureBuilder extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Text('${L10n.of(context)!.err_} ${snapshot.error}');
         } else {
-          if (!isDialogShown) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (snapshot.data == "success") {
-                showSuccessDialog(context, network);
-              } else if (snapshot.data == "loginTimedOut") {
-                showTimeoutDialog(context, network);
-              }
-            });
-          }
           return Container();
         }
-      },
-    );
-  }
-
-  // showDialog of a success message when connecting and updating socialNetwork
-  Future<void> showSuccessDialog(
-      BuildContext context, SocialNetwork network) async {
-    setDialogShown();
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            L10n.of(context)!.wellDone,
-          ),
-          content: Text(
-            L10n.of(context)!.whatsAppConnectedText,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // SocialNetwork network update
-                SocialNetworkManager.socialNetworks
-                    .firstWhere((element) => element.name == network.name)
-                    .connected = true;
-
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                L10n.of(context)!.ok,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // showDialog of elapsed time error message
-  Future<void> showTimeoutDialog(
-      BuildContext context, SocialNetwork network) async {
-    setDialogShown();
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            L10n.of(context)!.errElapsedTime,
-          ),
-          content: Text(
-            L10n.of(context)!.errExpiredSession,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                L10n.of(context)!.ok,
-              ),
-            ),
-          ],
-        );
       },
     );
   }
