@@ -6,15 +6,17 @@ import 'package:tawkie/pages/add_bridge/add_bridge.dart';
 import 'package:tawkie/pages/add_bridge/model/social_network.dart';
 
 class QRCodeConnectPage extends StatefulWidget {
-  final String qrCode;
-  final String code;
+  final String? qrCode;
+  final String? code;
+  final dynamic stepData;
   final BotController botConnection;
   final SocialNetwork socialNetwork;
 
   const QRCodeConnectPage({
     super.key,
-    required this.qrCode,
-    required this.code,
+    this.qrCode,
+    this.code,
+    this.stepData,
     required this.botConnection,
     required this.socialNetwork,
   });
@@ -31,8 +33,17 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
   void initState() {
     super.initState();
     widget.botConnection.continueProcess = true;
-    responseFuture = widget.botConnection.fetchDataWhatsApp();
+
+    if (widget.socialNetwork.name == "WhatsApp") {
+      responseFuture = Future(() async {
+        await widget.botConnection.checkLoginStatus(widget.socialNetwork,  widget.stepData);
+        return "waiting";
+      });
+    } else {
+      responseFuture = widget.botConnection.fetchDataWhatsApp();
+    }
   }
+
 
   @override
   void dispose() {
@@ -83,72 +94,54 @@ class _QRCodeConnectPageState extends State<QRCodeConnectPage> {
 // Connection explanation section
 class QRExplanation extends StatelessWidget {
   final SocialNetwork network;
-  final String qrCode;
-  final String code;
+  final String? qrCode;
+  final String? code;
 
   const QRExplanation({
     super.key,
     required this.network,
-    required this.qrCode,
-    required this.code,
+    this.qrCode,
+    this.code,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget qrWidget;
-
     List<String> qrExplains = [];
+    Widget? qrWidget;
+    Widget? codeWidget;
 
-    switch (network.name) {
-      case "WhatsApp":
-        qrExplains = [
-          L10n.of(context)!.whatsAppQrExplainOne,
-          L10n.of(context)!.whatsAppQrExplainTwo,
-          L10n.of(context)!.whatsAppQrExplainTree,
-          L10n.of(context)!.whatsAppQrExplainFour,
-          L10n.of(context)!.whatsAppQrExplainFive,
-          L10n.of(context)!.whatsAppQrExplainSix,
-          L10n.of(context)!.whatsAppQrExplainSeven,
-          L10n.of(context)!.whatsAppQrExplainEight,
-          L10n.of(context)!.whatsAppQrExplainNine,
-        ];
+    if (network.name == "WhatsApp") {
+      qrExplains = [
+        L10n.of(context)!.whatsAppQrExplainOne,
+        L10n.of(context)!.whatsAppQrExplainTwo,
+        L10n.of(context)!.whatsAppQrExplainTree,
+        L10n.of(context)!.whatsAppQrExplainFour,
+        L10n.of(context)!.whatsAppQrExplainFive,
+        L10n.of(context)!.whatsAppQrExplainSix,
+        L10n.of(context)!.whatsAppQrExplainSeven,
+        L10n.of(context)!.whatsAppQrExplainEight,
+        L10n.of(context)!.whatsAppQrExplainNine,
+      ];
 
+      if (qrCode != null) {
         qrWidget = QrImageView(
-          data: qrCode,
+          data: qrCode!,
           version: QrVersions.auto,
           size: 300,
         );
-        break;
-      default:
-        qrWidget = QrImageView(
-          data: qrCode,
-          version: QrVersions.auto,
-          size: 300,
-        );
-        break;
-    }
+      }
 
-    return Column(
-      children: [
-        ...qrExplains.take(5).map((text) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Text(
-                text,
-                style: const TextStyle(fontSize: 16),
-              ),
-            )),
-        const SizedBox(height: 8),
-        ElevatedButton(
+      if (code != null) {
+        codeWidget = ElevatedButton(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: code));
-            final SnackBar snackBar =
-                SnackBar(content: Text(L10n.of(context)!.codeCopy));
+            Clipboard.setData(ClipboardData(text: code!));
+            final SnackBar snackBar = SnackBar(content: Text(L10n.of(context)!.codeCopy));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
           child: Padding(
             padding: const EdgeInsets.all(2.0),
             child: Text(
-              code,
+              code!,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -157,26 +150,42 @@ class QRExplanation extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        );
+      }
+    }
+
+    return Column(
+      children: [
+        ...qrExplains.take(5).map((text) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        )),
+        const SizedBox(height: 8),
+        if (codeWidget != null) codeWidget,
+        if (qrWidget != null) qrWidget,
         const SizedBox(height: 8),
         const Divider(
           color: Colors.grey,
           height: 20,
         ),
-        ...qrExplains.skip(5).map(
-              (text) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(text,
-                    style: const TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center),
-              ),
+        if(qrWidget != null)
+          ...qrExplains.skip(5).map(
+                (text) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Text(text,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center),
             ),
+          ),
         const SizedBox(height: 8),
-        qrWidget,
       ],
     );
   }
 }
+
 
 // FutureBuilder part listening to responses in real time
 class QRFutureBuilder extends StatelessWidget {

@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 import 'package:tawkie/config/app_config.dart';
 import 'package:tawkie/pages/add_bridge/add_bridge_body.dart';
+import 'package:tawkie/pages/add_bridge/qr_code_connect.dart';
 import 'package:tawkie/pages/add_bridge/service/hostname.dart';
 import 'package:tawkie/pages/add_bridge/service/reg_exp_pattern.dart';
 import 'package:tawkie/pages/add_bridge/show_bottom_sheet.dart';
@@ -791,6 +793,7 @@ class BotController extends State<AddBridge> {
       BuildContext context, SocialNetwork network) async {
     final connectionState =
     Provider.of<ConnectionStateModel>(context, listen: false);
+
     switch (network.name) {
       case "WhatsApp":
         await startBridgeLogin(context, connectionState, network);
@@ -835,13 +838,28 @@ class BotController extends State<AddBridge> {
   // 📌 ************************** Messenger & Instagram **************************
   // 📌 ***********************************************************************
 
-  Future<void> handleStepResponse(
-      Response response, SocialNetwork network) async {
+  Future<void> handleStepResponse(Response response, SocialNetwork network, String loginId) async {
     if (response.statusCode == 200) {
       final stepData = response.data;
+
       if (stepData['type'] == 'complete') {
         setState(() => network.updateConnectionResult(true));
         if (kDebugMode) print("Login successful for ${network.name}");
+      } else if (stepData['type'] == 'display_and_wait' && stepData['display_and_wait']?['type'] == 'code') {
+        final pairingCode = stepData['display_and_wait']['data'];
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => QRCodeConnectPage(
+              qrCode: null,
+              code: pairingCode,
+              stepData: stepData,
+              botConnection: this,
+              socialNetwork: network,
+            ),
+          ),
+        );
+
       } else {
         network.setError(true);
         _handleError(network, ConnectionError.unknown, 'Unexpected response type: ${stepData['type']}');
@@ -851,7 +869,6 @@ class BotController extends State<AddBridge> {
       _handleError(network, ConnectionError.unknown, 'Error submitting step: ${response.statusCode}');
     }
   }
-
 
   Future<void> loginWithCookies(SocialNetwork network, String loginId, String stepId, String stepType) async {
     final userId = client.userID;
@@ -867,12 +884,149 @@ class BotController extends State<AddBridge> {
 
       final stepResponse = await dio.post(stepUrl, data: formattedCookieString);
 
-      await handleStepResponse(stepResponse, network);
+      await handleStepResponse(stepResponse, network, loginId);
     } else {
       network.setError(true);
       _handleError(network, ConnectionError.unknown, 'Unexpected step type: $stepType');
     }
   }
+
+  Future<void> loginWithQRCode(SocialNetwork network, String loginId, String stepId) async {
+    //Todo: Make the function
+  }
+
+  Future<void> loginWithPhone(SocialNetwork network, String loginId, String stepId, String stepType) async {
+    final userId = client.userID;
+    final phoneNumber = await showPhoneNumberDialog(context, network);
+
+    if (stepType == 'user_input') {
+      final stepUrl = '/${network.apiPath}/_matrix/provision/v3/login/step/$loginId/$stepId/user_input?user_id=$userId';
+
+      final stepResponse = await dio.post(
+        stepUrl,
+        data: jsonEncode({
+          "phone_number": phoneNumber,
+        }),
+      );
+
+      await handleStepResponse(stepResponse, network, loginId);
+
+    } else {
+      network.setError(true);
+      _handleError(network, ConnectionError.unknown, 'Unexpected step type: $stepType');
+    }
+  }
+
+  Future<String?> showPhoneNumberDialog(BuildContext context, SocialNetwork network) async {
+    final TextEditingController controller = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final Completer<bool> completer = Completer<bool>();
+
+    return showDialog<String?>(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: SingleChildScrollView(
+            child: AlertDialog(
+              title: Text(
+                "${L10n.of(context)!.connectYourSocialAccount} ${network.name}",
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: WhatsAppLoginForm(
+                formKey: formKey,
+                controller: controller,
+                completerCallback: completer.complete,
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    completer.complete(false);
+                  },
+                  child: Text(L10n.of(context)!.cancel),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (controller.text.isNotEmpty) {
+                      Navigator.of(context).pop(controller.text);
+                    }
+                  },
+                  child: Text(
+                    L10n.of(context)!.login,
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> checkLoginStatus(SocialNetwork network, dynamic stepData) async {
+    final userId = client.userID;
+    final loginId = stepData['login_id'];
+    final stepId = stepData['step_id'];
+    final checkStatusUrl = '/${network.apiPath}/_matrix/provision/v3/login/step/$loginId/$stepId/display_and_wait?user_id=$userId';
+
+    try {
+      final statusResponse = await dio.post(checkStatusUrl);
+
+      if (statusResponse.statusCode == 200) {
+        final statusData = statusResponse.data;
+
+        if (statusData['type'] == 'complete') {
+          setState(() => network.updateConnectionResult(true));
+          if (kDebugMode) {
+            print("Login successful for ${network.name}");
+          }
+          Navigator.of(context).pop();
+        }
+      } else {
+        _handleError(network, ConnectionError.unknown, 'Error checking login status: ${statusResponse.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("error: $e");
+      }
+
+      if (e is DioException && e.response?.statusCode == 500){
+        // Show timeout dialog
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                L10n.of(context)!.errElapsedTime,
+              ),
+              content: Text(
+                L10n.of(context)!.errExpiredSession,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    L10n.of(context)!.ok,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
   Future<void> startBridgeLogin(
       BuildContext context,
       ConnectionStateModel connectionState,
@@ -905,6 +1059,13 @@ class BotController extends State<AddBridge> {
 
         // Step 2: For differents methods
         switch (network.name) {
+          case "WhatsApp":
+            if(PlatformInfos.isMobile){
+              await loginWithPhone(network, loginId, stepId, stepType);
+            }else{
+              await loginWithQRCode(network, loginId, stepId);
+            }
+            break;
 
           case "Facebook Messenger":
           case "Instagram":
