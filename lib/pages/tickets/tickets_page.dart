@@ -69,18 +69,28 @@ class TicketsPage extends StatelessWidget {
                 children: [
                   Positioned(
                     top: 40,
-                    left: 50,
-                    right: 50,
+                    left: 20,
+                    right: 20,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          L10n.of(context)!.ticketsReports,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            Text(
+                              L10n.of(context)!.ticketsReports,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                         Row(
                           children: [
