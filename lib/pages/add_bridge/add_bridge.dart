@@ -870,8 +870,11 @@ class BotController extends State<AddBridge> {
     }
   }
 
-  Future<void> loginWithCookies(SocialNetwork network, String loginId, String stepId, String stepType) async {
+  Future<void> loginWithCookies(SocialNetwork network, dynamic startData) async {
     final userId = client.userID;
+    final loginId = startData['login_id'];
+    final stepType = startData['type'];
+    final stepId = startData['step_id'];
     final cookieManager = WebviewCookieManager();
 
     if (stepType == 'user_input' || stepType == 'cookies') {
@@ -895,8 +898,11 @@ class BotController extends State<AddBridge> {
     //Todo: Make the function
   }
 
-  Future<void> loginWithPhone(SocialNetwork network, String loginId, String stepId, String stepType) async {
+  Future<void> loginWithPhone(SocialNetwork network, dynamic startData) async {
     final userId = client.userID;
+    final loginId = startData['login_id'];
+    final stepType = startData['type'];
+    final stepId = startData['step_id'];
     final phoneNumber = await showPhoneNumberDialog(context, network);
 
     if (stepType == 'user_input') {
@@ -1046,9 +1052,7 @@ class BotController extends State<AddBridge> {
 
       if (startResponse.statusCode == 200) {
         final startData = startResponse.data;
-        final loginId = startData['login_id'];
         final stepType = startData['type'];
-        final stepId = startData['step_id'];
 
         // Update state if there's a display message
         if (stepType == 'display_and_wait') {
@@ -1061,7 +1065,7 @@ class BotController extends State<AddBridge> {
         switch (network.name) {
           case "WhatsApp":
             if(PlatformInfos.isMobile){
-              await loginWithPhone(network, loginId, stepId, stepType);
+              await loginWithPhone(network, startData);
             }else{
               await loginWithQRCode(network, loginId, stepId);
             }
@@ -1069,7 +1073,7 @@ class BotController extends State<AddBridge> {
 
           case "Facebook Messenger":
           case "Instagram":
-            await loginWithCookies(network, loginId, stepId, stepType);
+            await loginWithCookies(network, startData);
             break;
 
           default:
