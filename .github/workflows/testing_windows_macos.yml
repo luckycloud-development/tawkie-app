@@ -1,0 +1,116 @@
+name: Testing Windows & MacOS Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - build-windows-release
+  workflow_dispatch:
+
+concurrency:
+  group: release_workflow
+  cancel-in-progress: true
+
+jobs:
+  build_ios:
+    runs-on: macos-14
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - uses: actions/checkout@v4
+      - run: cat .github/workflows/versions.env >> $GITHUB_ENV
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'zulu'
+      - name: Apply Google Services Patch
+        run: git apply ./scripts/enable-android-google-services.patch
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Remove Emoji Font
+        run: |
+          rm -rf fonts/NotoEmoji
+          yq -i 'del( .flutter.fonts[] | select(.family == "NotoEmoji") )' pubspec.yaml
+      - run: flutter pub get
+      - run: cd ios && pod install && cd ..
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Install Fastlane
+        run: gem install fastlane -NV
+      - name: Decode signing certificate into a file
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_DIST_SIGNING_KEY }}
+        run: |
+          cd ios && echo $CERTIFICATE_BASE64 | base64 --decode > signing-cert.p12 && cd ..
+
+      - name: Build & upload iOS binary
+        run: cd ios && fastlane beta
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.IOS_DIST_SIGNING_KEY_PASSWORD }}
+          SIGNING_KEY_FILE_PATH: signing-cert.p12
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks and downloads project source code from GitHub repository
+
+      - name: Setup environment variables
+        run: cat .github/workflows/versions.env >> $GITHUB_ENV
+        # Load environment variables from versions.env file
+
+      - name: Prepare Windows environment
+        run: ./scripts/prepare-windows.ps1
+        shell: pwsh
+        # Executes PowerShell script to prepare Windows environment
+
+      - name: Build OLM library for Windows
+        run: ./scripts/build-olm-windows.sh
+        shell: bash
+        # Run the Olm compiler script for cryptography if use Matrix
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Get tag
+        id: tag
+        run: |
+          echo "TAG=$(git describe --tags)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Post-build Windows operations
+        run: ./scripts/build-windows.ps1
+        shell: pwsh
+
+      - name: Create Archive for Release
+        run: tar -czf "tawkie-windows.tar.gz" -C build/windows/runner/Release/ .
+        # Create an archive for the release and include the version in the filename
+      - name: Upload Windows Release to GitHub
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "tawkie-windows.tar.gz"
+          asset_name: "tawkie-windows-${{ env.TAG }}.tar.gz"
+          asset_content_type: application/gzip
+        # Upload the archive on the GitHub release page as an asset
